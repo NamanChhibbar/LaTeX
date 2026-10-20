@@ -1,0 +1,395 @@
+\documentclass{article}
+
+% Margins and spacing
+\usepackage[a4paper, margin=.7in]{geometry}
+% Math packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+% Figures and graphics
+\usepackage{graphicx}
+\usepackage{caption}
+% Placement of figures, tables, algorithms, etc.
+\usepackage{float}
+% Hyperlinks
+\usepackage{hyperref}
+% Reference section names
+\usepackage{nameref}
+% Algorithms
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+%% Tips
+% Fix spacing between lines
+% \vspace{-\baselineskip}
+
+% No section numbering
+\setcounter{secnumdepth}{0}
+% No page numbering
+\pagenumbering{gobble}
+% No paragraph indentation
+\setlength{\parindent}{0pt}
+% Removes caption prefixes (e.g., "Figure 1:") from figures
+% \captionsetup[figure]{labelformat=empty}
+
+% Define custom commands
+%% Underlined hyperlinks
+\newcommand{\uhref}[2]{\href{#1}{\underline{#2}}}
+%% Bold-italic math symbols
+\newcommand{\mathbi}[1]{\boldsymbol{#1}}
+%% Operators
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\sgn}{sgn}
+%% Manually indented states in algorithmic environment
+\newcommand{\IndentState}{\State \hspace{1em}}
+\newcommand{\DIndentState}{\State \hspace{2em}}
+
+\title{EE588: Homework 2 Solutions}
+\author{
+  Naman Chhibbar \\
+  USC ID: 7709-8548-02
+}
+\date{}
+
+% Document body
+\begin{document}
+\maketitle
+
+\begin{itemize}
+  \item[3.15] \textit{A family of concave utility functions.} For $0 < \alpha \le 1$ let
+  \[ u_\alpha(x) = \frac{x^\alpha - 1}{\alpha}, \]
+  with $\mathbf{dom} \, u_\alpha = \mathbb{R}_+$.
+  We also define $u_0(x) = \log x$ (with $\mathbf{dom} \, u_0 = \mathbb{R}_{++}$).
+  \begin{itemize}
+    \item[(a)] Show that for $x > 0$, $u_0(x) = \lim_{\alpha \to 0} u_\alpha(x)$.
+    \item[(b)] Show that $u_\alpha$ are concave, monotone increasing, and all satisfy $u_\alpha(1) = 0$.
+  \end{itemize}
+  \textbf{Solution:}
+  \begin{itemize}
+    \item[(a)] This can be easily shown by using L'Hospital's rule. For $x > 0$, we have:
+    \begin{align*}
+      \lim_{\alpha \to 0} u_\alpha(x) &= \lim_{\alpha \to 0} \frac{x^\alpha - 1}{\alpha} \\
+      &= \lim_{\alpha \to 0} \frac{d(x^\alpha - 1)/d\alpha}{d\alpha/d\alpha} \\
+      &= \lim_{\alpha \to 0} \frac{x^\alpha \log x}{1} \\
+      &= \log x \\
+      &= u_0(x)
+    \end{align*}
+    \item[(b)] Plugging $x = 1$ into $u_\alpha(x)$, we get:
+    \begin{itemize}
+      \item For $\alpha = 0$: $u_0(1) = \log 1 = 0$
+      \item For $\alpha > 0$: $u_\alpha(1) = \frac{1^\alpha - 1}{\alpha} = 0$
+    \end{itemize}
+    Hence, $u_\alpha(1) = 0$ for all $\alpha \ge 0$. \\
+    Now, we will show that $u_\alpha$ is concave and monotone increasing for $\alpha \in [0, 1]$.
+    For $\alpha = 0$, $u_0(x) = \log x$, which we know is concave and monotone increasing. \\
+    Now, let $\alpha \in (0, 1]$. Then:
+    \begin{align*}
+      u_\alpha(x) &= \frac{x^\alpha - 1}{\alpha} \\
+      \Rightarrow u_\alpha'(x) &= x^{\alpha - 1} \\
+    \end{align*}
+    Since $x > 0$, we have $u_\alpha'(x) > 0$, which implies that $u_\alpha$ is monotone increasing. \\
+    Now, we will show that $u_\alpha$ is concave.
+    \begin{align*}
+      u_\alpha''(x) &= (\alpha - 1) x^{\alpha - 2} \\
+      \Rightarrow u_\alpha''(x) &< 0
+    \end{align*}
+    since $\alpha < 1$ and $x > 0$. Hence, $u_\alpha$ is concave. \\
+  \end{itemize}
+
+  \item[3.16] For each of the following functions determine whether it is convex, concave, quasiconvex, or quasiconcave.
+  \begin{itemize}
+    \item[(a)] $f(x) = e^x - 1$ on $\mathbb{R}$.
+    \item[(b)] $f(x_1, x_2) = x_1 x_2$ on $\mathbb{R}_{++}^2$.
+    \item[(c)] $f(x_1, x_2) = 1 / (x_1 x_2)$ on $\mathbb{R}_{++}^2$.
+  \end{itemize}
+  \textbf{Solution:}
+  \begin{itemize}
+    \item[(a)] For $f(x) = e^x - 1$, we can easily see that it is convex since $f''(x) = e^x > 0 ~ \forall x \in \mathbb{R}$. Interestingly, this function is also both quasiconvex and quasiconcave since all sublevel and superlevel sets are either empty (non-positive sublevel sets) or a line in $\mathbb{R}$ (all superlevel sets and positive sublevel sets), which are all convex.
+    \item[(b)] For the given function, its hessian is:
+    \[ H = \nabla^2 f(x_1, x_2) = \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix} \]
+    which is neither postive semidefinite nor negative semidefinite. To show this, consider any vector $v = (x, y)$:
+    \begin{align*}
+      v^T H v &= \begin{bmatrix} x & y \end{bmatrix} \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} \\
+      &= \begin{bmatrix} y & x \end{bmatrix} \begin{bmatrix} x \\ y \end{bmatrix} \\
+      &= 2xy
+    \end{align*}
+    which can be either positive or negative. Hence, $f$ is neither convex nor concave. \\
+    On the other hand, $f$ is quasiconcave. To show this, consider any $\alpha$-superlevel set of $f$
+    \[ C = \{(x, y) \in \mathbb{R}_{++}^2 : xy \ge \alpha\} \]
+    Notice that if we rewrite the condition as $y \ge \alpha / x$, $C$ becomes the epigraph of the function $g(x) = \alpha / x$ with $\mathbf{dom}\,g = \mathbb{R}_{++}$. We can easily see that $g$ is convex:
+    \begin{align*}
+      g'(x) &= -\alpha / x^2 \\
+      \Rightarrow g''(x) &= 2 \alpha / x^3 > 0
+    \end{align*}
+    We know that the epigraph of a convex function is also convex. Hence, $C$ is convex for every $\alpha$. Therefore, $f$ is quasiconcave since its every superlevel set is convex. \\
+    $f$ is not quasiconvex since it has non-convex sublevel sets. Consider the 1-sublevel set
+    \[ C = \{(x, y) \in \mathbb{R}_{++}^2 : xy \le 1\} \]
+    We can see that $(2, 1/2), (1/2, 2) \in C$. Consider their convex combination with $\theta = 1/2$:
+    \begin{align*}
+      \theta (2, 1/2) + (1 - \theta) (1/2, 2) &= (1, 1/4) + (1/4, 1) \\
+      &= (5/4, 5/4)
+    \end{align*}
+    $(5/4, 5/4) \notin C$ since $5/4 \cdot 5/4 = 25/16 > 1$. Hence, $C$ is not convex and $f$ is not quasiconvex.
+    \item[(c)] Hessian for this function:
+    \[ \nabla^2 f(x_1, x_2) = \begin{bmatrix} 2/(x_1^3x_2) & 1/(x_1^2x_2^2) \\
+      1/(x_1^2x_2^2) & 2/(x_1x_2^3) \end{bmatrix} \]
+    We can check that $\nabla^2 f(x_1, x_2)$ is positive semidefinite for all $(x_1, x_2) \in \mathbb{R}_{++}^2$ using the principal minors test.
+    For a $2 \times 2$ matrix, the principal minors are the diagonal elements and the determinant of the matrix.
+    For $\nabla^2 f(x_1, x_2)$ to be positive semidefinite, its principal minors must be non-negative.
+    \[ 2/(x_1^3x_2) > 0 \qquad 2/(x_1x_2^3) > 0 \]
+    \begin{align*}
+      \begin{vmatrix} 2/(x_1^3x_2) & 1/(x_1^2x_2^2) \\ 1/(x_1^2x_2^2) & 2/(x_1x_2^3) \end{vmatrix}
+      &= 4/(x_1^4x_2^4) - 1/(x_1^4x_2^4) \\
+      &= 3/(x_1^4x_2^4) > 0
+    \end{align*}
+    For $(x_1, x_2) \in \mathbb{R}_{++}^2$. Hence, $\nabla^2 f$ is positive semidefinite in its domain, which means $f$ is convex. Since $f$ is convex, it is also quasiconvex. \\
+    $f$ is not quasiconcave since its 1-superlevel set
+    \[ C = \{(x, y) \in \mathbb{R}_{++}^2 : 1/(xy) \ge 1\} \]
+    is not convex. If we rewrite the condition as $xy \le 1$, we can see $C$ becomes the 1-sublevel set of the function $f(x_1, x_2) = x_1x_2$ from part (b), which we have proven to be non-convex.
+    Hence, $f$ (from the current question) is not quasiconcave.
+  \end{itemize}
+  
+  \item[3.22] \textit{Composition rules.} Show that the following functions are convex.
+  \begin{itemize}
+    \item[(a)] $f(x) = -\log\left(-\log\left(\sum_{i=1}^m e^{a_i^Tx+b_i}\right)\right)$ on $\mathbf{dom}\,f = \{x ~ | ~ \sum_{i=1}^m e^{a_i^Tx+b_i} < 1\}$. You can use the fact that $\log\left(\sum_{i=1}^n e^{y_i}\right)$ is convex.
+    \item[(b)]  $f(x, u, v) = -\sqrt{uv - x^Tx}$ on $\mathbf{dom}\,f = \{(x, u, v) ~ | ~ uv > x^Tx, ~ u, v > 0\}$. Use the fact that $x^Tx / u$ is convex in $(x, u)$ for $u > 0$, and that $-\sqrt{x_1x_2}$ is convex on $\mathbb{R}_{++}^2$.
+    \item[(c)] $f(x, u, v) = -\log(uv - x^Tx)$ on $\mathbf{dom}\,f = \{(x, u, v) ~ | ~ uv > x^Tx, ~ u, v > 0\}$.
+  \end{itemize}
+  \textbf{Solution:}
+  \begin{itemize}
+    \item[(a)] We will assume $x, a_i \in \mathbb{R}^n$ for all $i \in \{1, \dots, m\}$. Let $g(y_1, \dots, y_m) = \log\left(\sum_{i=1}^m e^{y_i}\right)$ with $\mathbf{dom}\,g = \mathbb{R}^m$, which is given to be convex in the question. \\
+    Let $f_1(x) = -\log x$ with $\mathbf{dom}\,f_1 = \mathbb{R}_{++}$ and $f_2(x) = -\log\left(\sum_{i=1}^m e^{a_i^Tx+b_i}\right)$ with $\mathbf{dom}\,f_2 = \{x : \sum_{i=1}^m e^{a_i^Tx+b_i} < 1\}$. Notice that $f_2$ can be written as:
+    \[ f_2(x) = -g(a_1^Tx+b_1, \dots, a_m^Tx+b_m) \]
+    That is, $f_2$ is the composition of $g$ and $m$ linear functions $a_i^Tx+b_i$. From the text, we know that $g(a_1^Tx+b_1, \dots, a_m^Tx+b_m)$ is convex if $g$ is convex and non-decreasing in each argument, and every $a_i^Tx+b_i$ is convex. \\
+    We are given that $g$ is convex and we know that affine transformations are convex (the Hessian is \textbf{0}). Let $i \in \{1, \dots, m\}$, then:
+    \[ \frac{\partial}{\partial y_i}g(y_1, \dots, y_m) = \frac{e^{y_i}}{\sum_{j=1}^m e^{y_j}} > 0 \]
+    Hence, $g(a_1^Tx+b_1, \dots, a_m^Tx+b_m)$ is convex and $f_2$ is concave. \\
+    Notice that the original function $f$ is the composition of $f_1$ and $f_2$. From the text, we know that $f$ is convex if $f_1$ is convex and non-increasing, and $f_2$ is concave. We have proven that $f_2$ is concave and we know that $f_1$ is convex since $\log$ is concave.
+    \begin{align*}
+      f_1'(x) &= \frac{d}{dx} (-\log x) \\
+      &= -1/x \\
+      \Rightarrow f_1'(x) &< 0 \quad \forall x \in \mathbb{R}_{++}
+    \end{align*}
+    Therefore, $f_1$ is non-increasing. Hence, we conclude that $f$ is convex.
+    \item[(b)] Let $f_1(x_1, x_2) = -\sqrt{x_1x_2}$ and $f_2(x, u, v) = v - \frac{x^Tx}{u}$. Notice that $f$ can be written as:
+    \begin{align*}
+      f(x, u, v) &= -\sqrt{uv - x^Tx} \\
+      &= -\sqrt{u \cdot \left(v - \frac{x^Tx}{u}\right)} \\
+      &= f_1(u, f_2(x, u, v))
+    \end{align*}
+    From the text, we know that $f$ is convex if $f_1$ is convex and non-increasing in each argument, $u$ is concave in $(x, u, v)$, and $f_2$ is concave. \\
+    We know that affine functions such as $g(u) = u$ are concave, $f_1$ is given to be convex in the question and is non-increasing in both arguments, proven below:
+    \[ \frac{\partial}{\partial x_1} f(x_1, x_2) = \frac{-1}{2}\sqrt{\frac{x_2}{x_1}} < 0
+    \qquad \qquad
+    \frac{\partial}{\partial x_2} f(x_1, x_2) = \frac{-1}{2}\sqrt{\frac{x_1}{x_2}} < 0 \]
+    Moreover, $f_2$ is concave since $v$ is concave and $\frac{x^tx}{u}$ is given to be convex, making $-\frac{x^tx}{u}$ and $f_2$ concave (addition preserves convexity/concavity). Hence, $f$ is convex.
+    \item[(c)] Rewrite the function as
+    \begin{align*}
+      f(x, u, v) &= -\log(uv - x^Tx) \\
+      &= -\log\left(u \cdot \left(v - \frac{x^tx}{u}\right)\right) \\
+      &= -\log u - \log\left(v - \frac{x^Tx}{u}\right)
+    \end{align*}
+    Since addition preserves convexity, $f$ will be convex if $-\log u$ and $-\log\left(v-\frac{x^Tx}{u}\right)$ are convex. \\
+    We know that $-\log u$ is convex.
+    Let $f_1(x) = -\log x$ and $f_2(x, u, v) = v - \frac{x^Tx}{u}$. We know that $f_1$ is convex and non-increasing from part (a) and $f_2$ is concave from part (b). Hence, the composition $f_1 \circ f_2$ is also convex. \\
+    Therefore, we conclude that $f$ is convex.
+  \end{itemize}
+
+  \item[3.24] \textit{Some functions on the probability simplex.} Let $x$ be a real-valued random variable which takes values in $\{a_1, \dots, a_n\}$ where $a_1 < a_2 < \dots < a_n$, with $\mathbf{prob}(x = a_i) = p_i$, $i = 1, \dots, n$. For each of the following functions of $p$ (on the probability simplex $\{p \in \mathbb{R}_+^n ~ | ~ \mathbf{1}^Tp = 1\}$), determine if the function is convex, concave, quasiconvex, or quasiconcave.
+  \begin{itemize}
+    \item[(a)] $\mathbf{E}\,x$
+    \item[(b)] $\mathbf{prob}(x \ge \alpha)$
+    \item[(c)] $\mathbf{prob}(\alpha \le x \le \beta)$
+    \item[(d)] $\sum_{i=1}^n p_i \log p_i$, the negative entropy of the distribution.
+    \item[(e)] $\mathbf{var}\,x = \mathbf{E}(x - \mathbf{E}\,x)^2$
+  \end{itemize}
+  \textbf{Solution:}
+  \begin{itemize}
+    \item[(a)] Let $a = (a_1, \dots, a_n)$ and $p = (p_1, \dots, p_n)$.
+    \begin{align*}
+      \mathbf{E}\,x &= \sum_{i=1}^n p_i a_i \\
+      &= a^T p
+    \end{align*}
+    Hence, $\mathbf{E}\,x$ is an affine transformation in $p$. Hence, it is both convex and concave. Furthermore, it is also quasiconvex, and quasiconcave (implied from convexity and concavity).
+    \item[(b)] Note that $\mathbf{prob}(x \ge \alpha)$ will be a linear combination of $p_i$'s with weights either 0 or 1.
+    More specifically, if $a_{i-1} \le \alpha \le a_i$, then $\mathbf{prob}(x \ge \alpha) = \sum_{j=i}^n p_j$ for $i \in \{1, \dots, n+1\}$, assuming $a_0 = -\infty$ and $a_{n+1} = \infty$. If $i = n + 1$, then $\mathbf{prob}(x \ge \alpha) = 0$. \\
+    In both cases, $\mathbf{prob}(x \ge \alpha)$ is a linear combination of $p_i$'s with 0 or 1 weights, which means $\mathbf{prob}(x \ge \alpha)$ is again convex, concave, quasiconvex, and quasiconcave.
+    \item[(c)] Once again, $\mathbf{prob}(\alpha \le x \le \beta)$ will be a linear combination of $p_i$'s. Specifically, if $a_{i-1} \le \alpha \le a_i$ and $a_{j-1} \le \beta \le a_j$ for $i, j \in \{1, \dots, n+1\}$ with $i \le j$, then $\mathbf{prob}(\alpha \le x \le \beta) = \sum_{k=i}^{j-1} p_k$.
+    If $i = n + 1$, $j = 1$, or $i = j$, then $\mathbf{prob}(\alpha \le x \le \beta) = 0$. \\
+    In any case, $\mathbf{prob}(\alpha \le x \le \beta)$ is a linear combination of $p_i$'s with 0 or 1 weights again. Hence, it is convex, concave, quasiconvex, and quasiconcave once again.
+    \item[(d)] Let $f(p) = \sum_{i=1}^n p_i \log p_i$. Notice that
+    \[ \frac{\partial^2}{\partial p_i^2} f(p) = \frac{1}{p_i} \quad \forall i \in \{1, \dots, n\}
+    \qquad \qquad \text{and} \qquad \qquad
+    \frac{\partial^2}{\partial p_i \partial p_j} f(p) = 0 \quad \forall i, j \in \{1, \dots, n\}, i \ne j \]
+    Hence, the Hessian of $f$ is $\mathbf{diag}(1/p_1, \dots, 1/p_n)$, which is positive semidefinite since all diagonal elements are positive. Therefore, $f$ is convex and quasiconvex as well.
+    \item[(e)] We know that we can write variance as
+    \begin{align*}
+      \mathbf{var}\,x &= \mathbf{E}(x - \mathbf{E}\,x)^2 \\
+      &= \mathbf{E}\,x^2 - (\mathbf{E}\,x)^2 \\
+      &= \sum_{i=1}^n p_i a_i^2 - \left(\sum_{i=1}^n p_i a_i\right)^2
+    \end{align*}
+    Let $a = (a_1, \dots, a_n)$ and $b = (a_1^2, \dots, a_n^2)$, then:
+    \begin{align*}
+      \mathbf{var}\,x &= b^T p - (a^T p)^2 \\
+      \Rightarrow \nabla \mathbf{var}\,x &= b^T - 2(a^T p)a \\
+      \Rightarrow \nabla^2 \mathbf{var}\,x &= -2 a a^T
+    \end{align*}
+    We can easily see that the Hessian of the variance is positive semidefinite since $v^T(aa^T)v = (a^Tv)^2 \ge 0$ for all vectors $v \in \mathbb{R}^n$. Therefore, $\mathbf{var}\,x$ is convex and quasiconvex.
+  \end{itemize}
+
+  \item[4.1] Consider the optimization problem
+  \begin{align*}
+    \text{minimize} \quad & f_0(x_1, x_2) \\
+    \text{subject to} \quad & 2x_1 + x_2 \ge 1 \\
+    & x_1 + 3x_2 \ge 1 \\
+    & x_1 \ge 0, \quad x_2 \ge 0.
+  \end{align*}
+  Make a sketch of the feasible set. For each of the following objective functions, give the optimal set and the optimal value.
+  \begin{itemize}
+    \item[(a)] $f_0(x_1, x_2) = x_1 + x_2$.
+    \item[(b)] $f_0(x_1, x_2) = -x_1 - x_2$.
+    \item[(c)] $f_0(x_1, x_2) = x_1$.
+    \item[(d)] $f_0(x_1, x_2) = \max\{x_1, x_2\}.$
+    \item[(e)] $f_0(x_1, x_2) = x_1^2 + 9x_2^2.$
+  \end{itemize}
+  \textbf{Solution:}
+  \begin{itemize}
+    \item[(a)] Label the constaints as (1), (2), (3), and (4) in order. Evaluating $2 \times (1) + (2)$:
+    \begin{align*}
+      4 x_1 + 2 x_2 + x_1 + 3 x_2 &\ge 2 + 1 \\
+      \Rightarrow 5 x_1 + 5 x_2 &\ge 3 \\
+      \Rightarrow x_1 + x_2 &\ge 3/5
+    \end{align*}
+    Let $f_0(x_1, x_2) = 3/5$, i.e. $x_2 = 3/5 - x_1$.
+    Plugging these values into the boundary conditions:
+    \begin{align*}
+      2 x_1 + x_2 &\ge 1 \\
+      \Rightarrow x_1 + 3/5 &\ge 1 \\
+      \Rightarrow x_1 &\ge 2/5 \\
+      x_1 + 3 x_2 &\ge 1 \\
+      \Rightarrow -2 x_1 + 9/5 &\ge 1 \\
+      \Rightarrow x_1 &\le 2/5
+    \end{align*}
+    From the two conditions, we get that $x_1$ has only one possible value, which is 2/5. From this, we can get the only value for $x_2 = 3/5 - x_1 = 1/5$. \\
+    Therefore, the optimal value is 3/5 and the optimal set is $\{(2/5, 1/5)\}$.
+    \item[(b)] We can see that this optimization problem is unbounded by considering the ray $R = \{(t, t) : t \ge 1\}$. We can confirm that $R$ lies in the feasible region as follows
+    \[ 2 x_1 + x_2 = 3 t \ge 3 \]
+    \[ x_1 + 3 x_2 = 4 t \ge 4 \]
+    And $t \ge 1$, so (3) and (4) hold trivially. Analyzing $f_0$ along $R$:
+    \[ f_0(t, t) = -2 t \]
+    which is unbounded. Therefore, the optimal value is $-\infty$ and the optimal set is $\emptyset$.
+    \item[(c)] We have the constraint $x_1 \ge 0$. Let's try $x_1 = 0$:
+    \begin{align*}
+      2 x_1 + x_2 &\ge 1 \\
+      \Rightarrow x_2 &\ge 1 \\
+      x_1 + 3 x_2 &\ge 1 \\
+      \Rightarrow x_2 &\ge 1/3
+    \end{align*}
+    Hence, we get the optimal value 0 on the optimal set $\{(0, x_2) : x_2 \ge 1\}$
+    \item[(d)] We'll break this problem into two cases. \\
+    Case 1: $x_1 \ge x_2$ \\
+    We will add a new constraint $x_1 - x_2 \ge 0$ labelled (5). Evaluating $(1) + (5)$:
+    \begin{align*}
+      3 x_1 &\ge 1 \\
+      \Rightarrow x_1 &\ge 1/3
+    \end{align*}
+    Evaluating $(2) + 3 \times (5)$:
+    \begin{align*}
+      4 x_1 &\ge 1 \\
+      x_1 &\ge 1/4
+    \end{align*}
+    Using $x_1 = 1/3$:
+    \begin{align*}
+      2 x_1 + x_2 &\ge 1 \\
+      \Rightarrow 2/3 + x_2 &\ge 1 \\
+      \Rightarrow x_2 &\ge 1/3 \\
+      x_2 &\le x_1 \\
+      \Rightarrow x_2 &\le 1/3
+    \end{align*}
+    From the inequalities, we can see that the only value for $x_2$ is 1/3. Hence, in this case, the optimal value is 1/3 and the optimal set is $\{(1/3, 1/3)\}$. \\
+    Case 2: $x_2 \ge x_1$ \\
+    We'll add the constraint $x_2 - x_1 \ge 0$ labelled as (5) this time. Evaluating $(1) + 2 \times (5)$:
+    \begin{align*}
+      3 x_2 &\ge 1 \\
+      \Rightarrow x_2 &\ge 1/3
+    \end{align*}
+    Evaluating $(2) + (5)$:
+    \begin{align*}
+      4 x_2 &\ge 1 \\
+      \Rightarrow x_2 &\ge 1/4
+    \end{align*}
+    Using $x_2 = 1/3$:
+    \begin{align*}
+      2 x_1 + x_2 &\ge 1 \\
+      \Rightarrow 2 x_1 + 1/3 &\ge 1 \\
+      \Rightarrow x_1 &\ge 1/3 \\
+      x_1 &\le x_2 \\
+      \Rightarrow x_1 &\le 1/3
+    \end{align*}
+    We again get the only value for $x_1 = 1/3$. Hence, we get the optimal value 1/3 and optimal set $\{(1/3, 1/3)\}$ in this case as well. \\
+    Therefore, we conclude that the optimal value is 1/3 and the optimal set is $\{(1/3, 1/3)\}$ for this problem.
+    \item[(e)] Using Cauchy-Schwarz inequality on constraint (2):
+    \begin{align*}
+      (x_1 + 3 x_2)^2 &= (1 \cdot x_1 + 1 \cdot (3 x_2))^2\\
+      &\le (1^2 + 1^2)(x_1^2 + (3 x_2)^2) \\
+      \Rightarrow 1 \le (x_1 + 3 x_2)^2 &\le 2(x_1^2 + 9 x_2^2) \\
+      \Rightarrow x_1^2 + 9 x_2^2 &\ge 1/2
+    \end{align*}
+    To ensure that 1/2 is reachable, we need equality in the Cauchy-Schwarz inequality that happens if the two vectors are scalar multiples. Since we used (1, 1) as one of the vectors, we must have $x_1 = 3 x_2$. \\
+    Using this with $x_1 + 3 x_2 = 1$:
+    \begin{align*}
+      x_1 + 3 x_2 &= 6 x_2 = 1 \\
+      \Rightarrow x_2 &= 1/6 \\
+      \Rightarrow x_1 &= 1/2
+    \end{align*}
+    Now, we will check if (1/2, 1/6) is feasible:
+    \[ 2 x_1 + x_2 = 5/6 \ge 1 \]
+    and of course, $1/2 \ge 0$ and $1/6 \ge 0$. Ensuring $f(1/2, 1/6) = 1/2$:
+    \[ f(1/2, 1/6) = 1/4 + 9/36 = 1/2 \]
+    Therefore, the optimal value is 1/2 and the optimal set it $\{(1/2, 1/6)\}$.
+  \end{itemize}
+
+  \item[4.11] \textit{Problems involving $\ell_1$- and $\ell_\infty$-norms.} Formulate the following problems as LPs. Explain in detail the relation between the optimal solution of each problem and the solution of its equivalent LP.
+  \begin{itemize}
+    \item[(a)] Minimize $\|Ax - b\|_\infty$ ($\ell_\infty$ norm approximation).
+    \item[(b)] Minimize $\|Ax - b\|_1$ ($\ell_1$ norm approximation).
+    \item[(c)] Minimize $\|Ax - b\|_1$ subject to $\|x|_\infty \le 1$.
+    \item[(d)] Minimize $\|x|\_1$ subject to $\|Ax - b\|_\infty \le 1$.
+    \item[(e)] Minimize $\|Ax - b\|_1 + \|x\|_\infty$.
+  \end{itemize}
+  In each problem, $A \in \mathbb{R}^{m \times n}$ and $b \in \mathbb{R}^m$ are given. \\
+  \textbf{Solution:}
+  \begin{itemize}
+    \item[(a)] To formulate an equivalent LP, introduce an auxillary variable $t \ge 0$. We want:
+    \[ \|Ax - b\|_\infty \le t \mathbf{1}_m \]
+    where $\mathbf{1}_m$ denotes vector of ones of size $m$ and $\le$ denotes component-wise comparison.
+    If $a_i$ and $b_i$ denote the $i$th row of $A$ and $i$th element of $b$, this would translate to:
+    \[ \|Ax - b\|_\infty \le t \mathbf{1}_m \iff |a_i^Tx - b_i| \le t ~ \forall i \in \{1, \dots, m\} \]
+    \[ \iff a_i^T x - b_i \le t \quad \text{and} \quad -a_i^Tx + b_i \le t \quad \forall i \in \{1, \dots, m\} \]
+    \[ \iff a_i^T x - t \le b_i \quad \text{and} \quad -a_i^Tx - t \le -b_i \quad \forall i \in \{1, \dots, m\} \]
+    \[ \iff Ax - t \mathbf{1}_m \le b \quad \text{and} \quad -Ax - t \mathbf{1}_m \le -b \]
+    Hence, the LP becomes to minimize $t$ with the constraints $Ax - t \mathbf{1}_m \le b$ and $-Ax - t \le -b$ in $(x, t)$.
+    The solution of this LP will be directly related to the original solution. If $(x^*, t^*)$ is the solution of the LP, then:
+    \[ x^* = \argmin_x \|Ax - b\|_\infty \]
+    \[ t^* = \min_x \|Ax - b\|_\infty \]
+    \item[(b)] We now consider $m$ auxillary variables $t = (t_1, \dots, t_m)$ to bound every $m$ components of $\|Ax - b\|_1$:
+    \[ |a_i^T x - b_i| \le t_i \quad \forall i \in \{1, \dots, m\} \]
+    Following similar calculations as in part (a), we will get:
+    \[ Ax - t \le b \quad \text{and} \quad -Ax - t \le -b \]
+    We can easily see that
+    \[ \|Ax - b\|_1 \le \sum_{i=1}^m t_i = \mathbf{1}_m^T t \]
+    Therefore, the LP becomes minimizing $\mathbf{1}_m^T t$ subject to $Ax - t \le b$ and $-Ax - t \le -b$ in $(x, t)$.
+    If $(x^*, t^*)$ is the solution of the LP, then:
+    \[ x^* = \argmin_x \|Ax - b\|_1 \]
+    \[ \mathbf{1}_m^T t^* = \min_x \|Ax - b\|_1 \]
+    \item[(c)] We can rewrite the constraint $\|x\|_\infty \le 1$ as
+    \[ x \le \mathbf{1}_n \quad \text{and} \quad -x \le \mathbf{1}_n \]
+    With these additional constraint to the LP in part (b), the new LP becomes minimizing $\mathbf{1}_m^T t$ subject to $Ax -b \le b$, $-Ax - t \le -b$, $x \le \mathbf{1}_n$, and $-x \le \mathbf{1}_n$.
+    The solution of the LP is again directly related to the original problem. If $(x^*, t^*)$ is the solution of the LP, then:
+    \[ x^* = \argmin_x \|Ax - b\|_1 \]
+    \[ \mathbf{1}_m^T t^* = \min_x \|Ax - b\|_1 \]
+    subject to $\|x\|_\infty \le 1$.
+  \end{itemize}
+\end{itemize}
+
+\end{document}

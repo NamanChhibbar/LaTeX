@@ -1,0 +1,56 @@
+\documentclass{article}
+
+% Margins and spacing
+\usepackage[a4paper, margin=.7in]{geometry}
+% Math packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+% Figures and graphics
+\usepackage{graphicx}
+\usepackage{caption}
+% Placement of figures, tables, algorithms, etc.
+\usepackage{float}
+% Hyperlinks
+\usepackage{hyperref}
+% Reference section names
+\usepackage{nameref}
+% Algorithms
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+%% Tips
+% Fix spacing between lines
+% \vspace{-\baselineskip}
+
+% No section numbering
+\setcounter{secnumdepth}{0}
+% No page numbering
+\pagenumbering{gobble}
+% No paragraph indentation
+\setlength{\parindent}{0pt}
+% Removes caption prefixes (e.g., "Figure 1:") from figures
+\captionsetup[figure]{labelformat=empty}
+
+% Define custom commands
+%% Underlined hyperlinks
+\newcommand{\uhref}[2]{\href{#1}{\underline{#2}}}
+%% Bold-italic math symbols
+\newcommand{\mathbi}[1]{\boldsymbol{#1}}
+%% Operators
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+%% Manually indented states in algorithmic environment
+\newcommand{\IndentState}{\State \hspace{1em}}
+\newcommand{\DIndentState}{\State \hspace{2em}}
+
+\title{}
+\author{}
+\date{}
+
+% Document body
+\begin{document}
+\maketitle
+
+
+
+\end{document}

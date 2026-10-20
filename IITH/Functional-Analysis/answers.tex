@@ -1,0 +1,926 @@
+\documentclass{article}
+\usepackage[a4paper, margin=.7in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumitem}
+
+\setcounter{secnumdepth}{0}
+\setlength{\parindent}{0pt}
+
+\title{Functional Analysis: Assignment 1}
+
+\author{
+	Naman Chhibbar \\
+	MA21BTECH11011
+}
+
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Question 1}
+
+	Prove that $\sum_{k = 1}^{n} a_k \cdot x^{m_k} = 0 ~ \forall x \in \mathbb{R}
+	\Rightarrow  a_k = 0 ~ \forall 1 \le k \le n$. \\
+
+	Let $f(x) = \sum_{k = 1}^{n} a_k \cdot x^{m_k}$.
+	Without loss of generality, assume $m_i < m_j ~ \forall i < j$.
+	We have,
+	\[
+		f(x) = 0 \quad \forall x \in \mathbb{R} \Rightarrow
+		f^{(m)}(x) = 0 \quad \forall x \in \mathbb{R} ~ \forall m \in \mathbb{N}
+	\]
+	where $f^{(m)}$ denotes the $m^{th}$ derivative of $f$.
+	Now,
+	\[ f^{(m_k)}(0) = m_k! \cdot a_k = 0 \quad \forall 1 \le k \le n \]
+	\[ \Rightarrow a_k = 0 \quad \forall 1 \le k \le n \]
+	Hence proved.
+
+\section{Question 2}
+
+	If $T: \mathbb{R} \to \mathbb{R}$ is a function such that $T(x + y) = T(x) + T(y) ~
+	\forall x, y \in \mathbb{R}$ and $T$ is continuous at $x_0 \in \mathbb{R}$, then prove
+	that $T$ is a linear map. \\
+
+	Claim: $T(-x) = -T(x) ~ \forall x \in \mathbb{R}$ and $T(0) = 0$.
+	\begin{align*}
+		T(x) + T(-x) + T(-x) &= T(x + (-x) + (-x)) \\
+		&= T(-x) \\
+		\Rightarrow T(-x) &= -T(x) \\
+	\end{align*}
+	Putting $x = 0$, we get $T(0) = 0$. \\
+
+	Claim: $T$ is continous on $\mathbb{R}$. \\
+	Since $T$ is continous at $x_0$, $\forall \epsilon > 0 ~ \exists \delta > 0$ such that
+	\begin{align*}
+		|x - x_0| < \delta &\Rightarrow |T(x) - T(x_0)| < \epsilon \\
+		\equiv |(x + y - y) - x_0| < \delta &\Rightarrow |T(x + y - y) - T(x_0)| < \epsilon \\
+		\equiv |(x + y - x_0) - y| < \delta &\Rightarrow |T(x + y - x_0) - T(y)| < \epsilon \\
+	\end{align*}
+	Let $x + y - x_0 = x'$, then $\forall \epsilon > 0 ~ \exists \delta > 0$ such that
+	\[ |x' - y| < \delta \Rightarrow |T(x') - T(y)| < \epsilon \]
+	proving that $T$ is continous at $y ~ \forall y \in \mathbb{R}$. \\
+
+	Claim: $T(\alpha x) = \alpha T(x) \quad \forall \alpha \in \mathbb{R} ~
+	\forall x \in \mathbb{R}$ \\
+	Case 1: $\alpha \in \mathbb{Z}$ \\
+	Since $T(x + y) = T(x) + T(y)$, we can easily see that $T(\alpha x) = \alpha T(x)$ if
+	$\alpha \ge 0$. \\
+	For $\alpha < 0$,
+	\begin{align*}
+		T(\alpha x) &= T(-(-\alpha) x) \\
+		&= -T(-\alpha x) \\
+		&= -(-\alpha) T(x) \qquad (-\alpha > 0) \\
+		&= \alpha T(x) \\
+	\end{align*}
+	Case 2: $\alpha \in \mathbb{Q}$ \\
+	Let $\alpha = p / q$, where $p, q \in \mathbb{Z}$ are co-primes, then:
+	\begin{align*}
+		p T(x) &= T(p x) \qquad (\text{from case 1}) \\
+		&= T \left(q \cdot \frac{p}{q} x \right) \\
+		&= q T \left(\frac{p}{q} x \right) \qquad (\text{from case 1}) \\
+		\Rightarrow \frac{p}{q} T(x) &= T \left(\frac{p}{q} x \right) \\
+		\Rightarrow T(\alpha x) &= \alpha T(x)
+	\end{align*}
+	Case 3: $\alpha \in \mathbb{R} \backslash \mathbb{Q}$ \\
+	Since $\mathbb{Q}$ is dense in $\mathbb{R}$, there exists a sequence
+	$\{r_n\}_{n \in \mathbb{N}}$ in $\mathbb{Q}$ such that $r_n \to \alpha$. \\
+	Now:
+	\begin{align*}
+		T(\alpha x) &= T \left(\lim_{n \to \infty} r_n x \right) \\
+		&= \lim_{n \to \infty} T(r_n x) \qquad (T \text{ is continuous}) \\
+		&= \lim_{n \to \infty} r_n T(x) \qquad (\text{from case 2}) \\
+		&= \alpha T(x)
+	\end{align*}
+
+	Hence $T$ is a linear map.
+
+\section{Question 3}
+
+	Let $V, W$ be two vector spaces and $x (\ne 0) \in V$, $y \in W$.
+	Prove that there exists a linear functional $f: V \to W$ such that $f(x) = y$. \\
+
+	Since $x \ne 0$, we can find a basis of V containing $x$.
+	We know that any linear transformation can be defined by its action on the basis elements,
+	we can define a linear transformation $T$ such that $T(x) = y$.
+	Hence proved.
+	
+\section{Question 4}
+
+	Let $V, W$ be two vector spaces over $\mathbb{F}$, then $L(V, W)$ is the set of all linear
+	maps from $V$ to $W$ with addition and multiplication defined as follows:
+
+	\[ (T + S)(x) = T(x) + S(x) \quad \forall x \in V, ~ T, S \in L(V, W) \]
+	\[ (\alpha \cdot T)(x) = \alpha \cdot T(x) \quad \forall x \in V, ~ T \in L(V, W), ~
+	\alpha \in \mathbb{F} \]
+
+	Let $\{e_1, e_2, \dots, e_n\}$ be a basis of $V$.
+	Define $f_i: V \to \mathbb{F}$ as $f_i(e_j) = \delta_{ij}$, where $\delta_{ij}$ is the
+	Kronecker delta.
+	$\{f_1, f_2, \dots, f_n\}$ is a basis of $V' = L(V, \mathbb{F})$, the algebraic dual
+	of $V$.
+	Let $x \in V$ and $f(x) = 0 ~ \forall f \in V'$.
+	Prove that $x = 0$. \\
+
+	Suppose $x \ne 0$.
+	Then, there exists a basis of $V$ containing $x$.
+	Since a linear tranformation can be defined by its action on the basis elements,
+	we can define a linear transformation $T$ such that $T(x) = 1$, which is a contradiction
+	since $f(x) = 0 ~ \forall f \in V'$.
+	Hence $x = 0$.
+
+\section{Question 5}
+
+	Let $(V, <\cdot, \cdot>)$ be an inner product space and $\mathcal{A} \subset V$.
+	$\mathcal{A}$ is an orthonormal set on $V$, that is:
+	\begin{itemize}
+		\item $<x, y> = 0 \quad \forall x, y \in \mathcal{A}, x \ne y$
+		\item $<x, x> = 1 \quad \forall x \in \mathcal{A}$
+	\end{itemize}
+	Prove that $\mathcal{A}$ is linearly independent on $V$. \\
+
+	Suppose $\mathcal{A}$ is linearly dependent.
+	Then, $\exists x_1, x_2, \dots, x_n \in \mathcal{A}$ and $\alpha_1, \alpha_2, \dots,
+	\alpha_n \in \mathbb{F}$ ($\alpha_i \ne 0 ~ \forall i$) such that:
+	\begin{align*}
+		\sum_{i = 1}^{n} \alpha_i \cdot x_i &= 0 \\
+		\Rightarrow <\sum_{i = 1}^{n} \alpha_i \cdot x_i, x_1> &= 0 \\
+		\Rightarrow \sum_{i = 1}^{n} \alpha_i <x_i, x_1> &= 0 \\
+		\Rightarrow \alpha_1 &= 0
+	\end{align*}
+	which is a contradiction.
+	Hence $\mathcal{A}$ is linearly independent on $V$.
+
+\section{Question 6}
+
+	Let $(X, d)$ be a metric space and $\{x_n\}_{n \in \mathbb{N}}$ be a Cauchy sequence in $X$.
+	Suppose $\{x_{n_k}\}_{k \in \mathbb{N}}$ is a subsequence of $\{x_n\}_n$ such that 
+	$\lim_{k \to \infty} x_{n_k} = x$.
+	Prove that $\lim_{n \to \infty} x_n = x$. \\
+
+	Since $\{x_n\}_{n \in \mathbb{N}}$ is a Cauchy sequence and $\lim_{k \to \infty} x_{n_k} = x$,
+	$\forall \epsilon > 0 ~ \exists N_0, K \in \mathbb{N}$ such that:
+	\[ d(x_n, x_m) < \epsilon \quad \forall n, m \ge N_0 \]
+	\[ d(x_{n_k}, x) < \epsilon \quad \forall k \ge K \]
+	Let $N = \max(N_0, n_K)$.
+	Then:
+	\[
+		d(x_n, x) \le d(x_n, x_{n_K}) + d(x_{n_K}, x) < 2\epsilon
+		\quad \forall n \ge N
+	\]
+	Let $\epsilon' = 2 \epsilon$, then $\forall \epsilon' > 0 ~ \exists N \in \mathbb{N}$
+	such that:
+	\[ d(x_n, x) < \epsilon' \quad \forall n \ge N \]
+
+	Hence $\lim_{n \to \infty} x_n = x$.
+
+\section{Question 7}
+
+	Prove that every discrete metric space is complete. \\
+
+	Let $(X, d)$ be a discrete metric space and $\{x_n\}_{n \in \mathbb{N}}$ be a Cauchy sequence
+	in $X$ and $\epsilon \in (0, 1)$.
+	Then, $\exists N \in \mathbb{N}$ such that:
+	\[ d(x_n, x_m) < \epsilon ~ \forall n, m \ge N \]
+	Since $d$ is the discrete metric:
+	\[ d(x_n, x_m) < \epsilon < 1 \]
+	\[ \Rightarrow d(x_n, x_m) = 0 \]
+	\[ \Rightarrow x_n = x_m ~ \forall n, m \ge N \]
+	Let $x = x_N \in X$.
+	Then, $x_n = x ~ \forall n \ge N$, i.e. $x_n \to x$.
+	Therefore, every Cauchy sequence in $(X, d)$ is convergent, i.e. every discrete metric space
+	is complete.
+
+\section{Question 8}
+
+	Let $f, g$ be two functions in $\mathcal{R}[a, b]$ (i.e. Riemann integrable functions on
+	$[a, b]$).
+	We say that $f \sim g$ if and only if:
+	\[ \int_{a}^{b} |f(x) - g(x)| ~ dx = 0 \]
+	Prove that $\sim$ is an equivalence relation on $\mathcal{R}[a, b]$. \\
+
+	We can easily verify that $\sim$ is reflexive ($f \sim f$) and symmetric ($f \sim g
+	\Rightarrow g \sim f$).
+
+	Claim: $\sim$ is transitive \\
+	Suppose $f \sim g$ and $g \sim h$, i.e. $\int_{a}^{b} |f(x) - g(x)| ~ dx = 0$ and
+	$\int_{a}^{b} |g(x) - h(x)| ~ dx = 0$.
+	Then:
+	\begin{align*}
+		\int_{a}^{b} |f(x) - h(x)| ~ dx &= \int_{a}^{b} |f(x) - g(x) + g(x) - h(x)| ~ dx \\
+		&\le \int_{a}^{b} |f(x) - g(x)| ~ dx + \int_{a}^{b} |g(x) - h(x)| ~ dx \\
+		&\le 0
+	\end{align*}
+	Since $|f(x) - h(x)| \ge 0 ~ \forall x \in [a, b]$, we have:
+	\[ \int_{a}^{b} |f(x) - h(x)| ~ dx = 0 \Rightarrow f \sim h \]
+
+	Hence $\sim$ is an equivalence relation on $\mathcal{R}[a, b]$.
+
+\section{Question 9}
+
+	Define
+	\[ l^p(\mathbb{N}) = \{(x_n) \in S(\mathbb{N}); \sum_{n = 1}^{\infty} |x_n|^p < \infty\} \]
+	for $1 \le p < \infty$. \\
+	Let $p, q$ be two numbers such that $1 \le p, q < \infty$ and $p \le q$.
+	Prove the following:
+
+	\begin{itemize}
+		\item $||(x_n)||_q \le ||(x_n)||_p \quad \quad \forall (x_n) \in l^p(\mathbb{N})$
+		\item $l^p(\mathbb{N}) \subset l^q(\mathbb{N})$
+	\end{itemize}
+
+	Proof (1):
+
+	Let $(x_n)_{n \in \mathbb{N}} \in l^p(\mathbb{N})$. \\
+	Case 1: $\sum_{n = 1}^{\infty} |x_n|^p = 1$ \\
+	We can easily see that $|x_n| < 1 ~ \forall n \in \mathbb{N}$.
+	Since $p \le q$,
+	\[ |x_n|^q \le |x_n|^p \quad \forall n \in \mathbb{N} \]
+	\[ \Rightarrow \sum_{n = 1}^{\infty} |x_n|^q \le \sum_{n = 1}^{\infty} |x_n|^p = 1 \]
+	\[ \Rightarrow \left(\sum_{n = 1}^{\infty} |x_n|^q\right) ^ {1/q} \le 1 \]
+	\[ \Rightarrow ||(x_n)||_q \le 1 \]
+	\[ \Rightarrow ||(x_n)||_q \le ||(x_n)||_p \]
+	Case 2: $\sum_{n = 1}^{\infty} |x_n|^p \ne 1$ \\
+	Let $||(x_n)||_p = c > 0$ (if $c = 0$ then $||(x_n)||_p = ||(x_n)||_q = 0$).
+	Then, $\sum_{n = 1}^{\infty} |x_n|^p = c^p$.
+	Now,
+	\[ ||(x_n)||_p = \left(\sum_{n = 1}^{\infty} |x_n|^p\right) ^ {1/p} = c \]
+	\[ \Rightarrow \left(\sum_{n = 1}^{\infty} \left|\frac{x_n}{c}\right|^p\right) ^ {1/p} = 1 \]
+	\[ \Rightarrow ||(y_n)||_p = 1 \]
+	where $(y_n)_{n \in \mathbb{N}} = (x_n / c)_{n \in \mathbb{N}}$.
+	As proven in case 1, $||(y_n)||_q \le ||(y_n)||_p$.
+	\[ ||(y_n)||_q \le ||(y_n)||_p \]
+	\[
+		\Rightarrow \left(\sum_{n = 1}^{\infty} |y_n|^q\right) ^ {1/q} \le
+		\left(\sum_{n = 1}^{\infty} |y_n|^p\right) ^ {1/p}
+	\]
+	\[
+		\Rightarrow \left(\sum_{n = 1}^{\infty} \left|\frac{x_n}{c}\right|^q\right) ^ {1/q} \le
+		\left(\sum_{n = 1}^{\infty} \left|\frac{x_n}{c}\right|^p\right) ^ {1/p}
+	\]
+	\[
+		\Rightarrow 1/c \cdot \left(\sum_{n = 1}^{\infty} |x_n|^q\right) ^ {1/q} \le
+		1/c \cdot \left(\sum_{n = 1}^{\infty} |x_n|^p\right) ^ {1/p}
+	\]
+	\[
+		\Rightarrow \left(\sum_{n = 1}^{\infty} |x_n|^q\right) ^ {1/q} \le
+		\left(\sum_{n = 1}^{\infty} |x_n|^p\right) ^ {1/p}
+	\]
+	\[ \Rightarrow ||(x_n)||_q \le ||(x_n)||_p \] \\
+
+	Proof (2):
+
+	Let $(x_n)_{n \in \mathbb{N}} \in l^p(\mathbb{N})$.
+	Then,
+	\[ \sum_{n = 1}^{\infty} |x_n|^p < \infty \]
+	\[ \Rightarrow ||(x_n)||_p < \infty \]
+	\[ \Rightarrow ||(x_n)||_q \le ||(x_n)||_p < \infty \]
+	\[ \Rightarrow \sum_{n = 1}^{\infty} |x_n|^q < \infty \]
+	\[ \Rightarrow (x_n)_{n \in \mathbb{N}} \in l^q(\mathbb{N}) \]
+	\[ \Rightarrow l^p(\mathbb{N}) \subset l^q(\mathbb{N}) \]
+
+\section{Question 10}
+
+	Prove the following inclusion for $1 \le p < \infty$:
+	\[
+		C_{00}(\mathbb{N}) \subset l^p(\mathbb{N}) \subset C_0(\mathbb{N}) \subset
+		C(\mathbb{N}) \subset l^{\infty}(\mathbb{N})
+	\]
+	Also, find $(x_n)_{n \in \mathbb{N}} \in C_0$ but $(x_n)_{n \in \mathbb{N}} \notin l^p$
+	for $1 \le p < \infty$. \\
+
+	Let $(x_n)_{n \in \mathbb{N}} \in C_{00}(\mathbb{N})$.
+	Then $\exists N \in \mathbb{N}$ such that $x_n = 0 ~ \forall n \ge N$.
+	\[ \therefore l^p(x_n) = \left(\sum_{n = 1}^{\infty} |x_n|^p\right) ^ {1/p}
+	= \left(\sum_{n = 1}^{N - 1} |x_n|^p\right) ^ {1/p}
+	< \infty \]
+	\[ \Rightarrow (x_n)_{n \in \mathbb{N}} \in l^p(\mathbb{N}) \]
+	\[ \Rightarrow C_{00}(\mathbb{N}) \subset l^p(\mathbb{N}) \] \\
+
+	Let $(x_n)_{n \in \mathbb{N}} \in l^p(\mathbb{N})$.
+	Then:
+	\[ l^p(x_n) < \infty \]
+	\[ \Rightarrow \sum_{n = 1}^{\infty} |x_n|^p < \infty \]
+
+	Claim: $x_n \to 0$ \\
+	Suppose $x_n \to a \ne 0$.
+	Therefore, $\forall \epsilon > 0 ~ \exists N \in \mathbb{N}$ such that $|x_n - a| < \epsilon$.
+	\[ |a| = |a - x_n + x_n| \le |a - x_n| + |x_n| < \epsilon + |x_n| \]
+	\[ \Rightarrow |x_n| > |a| - \epsilon \]
+	Take $\epsilon = |a| / 2$.
+	Then,
+	\[ \Rightarrow |x_n| > |a| - \epsilon = |a| / 2 \]
+	\[ \Rightarrow \sum_{n = 1}^{\infty} |x_n| > \sum_{n = 1}^{\infty} |a| / 2 = \infty \]
+	which is a contradiction.
+	Hence $x_n \to 0$. \\
+	\[
+		\Rightarrow (x_n)_{n \in \mathbb{N}} \in C_0(\mathbb{N}) \quad
+		\forall (x_n)_{n \in \mathbb{N}} \in l^p(\mathbb{N})
+	\]
+	\[ \Rightarrow l^p(\mathbb{N}) \subset C_0(\mathbb{N}) \] \\
+
+	$C_0(\mathbb{N}) \subset C(\mathbb{N})$ trivially. \\
+
+	Let $(x_n)_{n \in \mathbb{N}} \in C(\mathbb{N})$, therefore $\exists x$ such that $x_n \to x$.
+	Therefore, $\forall \epsilon > 0 ~ \exists N \in \mathbb{N}$ such that:
+	\[ |x_n - x| < \epsilon \quad \forall n \ge N \]
+	\[ \Rightarrow |x_n| < |x| + \epsilon \quad \forall n \ge N \]
+	Let $M = \max\{|x_1|, |x_2|, \dots, |x_{N - 1}|, |x| + \epsilon\}$.
+	Then $|x_n| \le M ~ \forall n \in \mathbb{N}$.
+	Hence $(x_n)_{n \in \mathbb{N}}$ is bounded, i.e.
+	$(x_n)_{n \in \mathbb{N}} \in l^{\infty}(\mathbb{N})$.
+	Therefore, $C(\mathbb{N}) \subset l^{\infty}(\mathbb{N})$.
+
+\section{Question 11}
+
+	Notation: $e_i = (0, 0, \dots, 1, 0, \dots)$ where 1 is at the $i^{\text{th}}$ position.
+	Clearly, $e_i \in C_{00}(\mathbb{N}) ~ \forall i \in \mathbb{N}$.
+	Prove that $\{e_i: i \in \mathbb{N}\}$ is a linearly independent set.
+	Hence $C_{00}(\mathbb{N}), l^p(\mathbb{N}), C_0(\mathbb{N}), C(\mathbb{N})$ are infinite
+	dimensional. \\
+
+	Suppose $\{e_i: i \in \mathbb{N}\}$ is linearly dependent.
+	Then, $\exists \alpha_{k_1}, \alpha_{k_2}, \dots, \alpha_{k_n}$, with $k_1 < k_2 < \dots < k_n$
+	and $\alpha_{k_i} \ne 0 ~ \forall 1 \le i \le n$, such that:
+	\[ \sum_{i = 1}^{n} \alpha_{k_i} \cdot e_{k_i} = 0 \]
+	At the $k_1^{\text{th}}$ position, we have $\alpha_{k_1} = 0$, which is a contradiction.
+	Hence $\{e_i: i \in \mathbb{N}\}$ is linearly independent.
+
+	Since $\{e_i: i \in \mathbb{N}\} \subset C_{00}(\mathbb{N}), l^p(\mathbb{N}), C_0(\mathbb{N}),
+	C(\mathbb{N})$, all these spaces are infinite dimensional.
+
+\section{Question 12}
+
+	Let $(X, ||\cdot||)$ be a normed linear space and $A \subseteq X$.
+	Define:
+	\begin{align*}
+		\eta_A(x) &= d(x, A) \\
+		&= \inf_{a \in A} ||x - a||
+	\end{align*}
+	Prove that $\eta_A: X \to \mathbb{R}$ is a uniformly continuous function. \\
+
+	Let $x, y \in X$.
+	Then:
+	\begin{align*}
+		\eta_A(x) &= \inf_{a \in A} ||x - a|| \\
+		&\le ||x - a|| \quad \forall a \in A \\
+		&\le ||x - y|| + ||y - a|| \quad \forall a \in A \\
+		&\le ||x - y|| + \inf_{a \in A} ||y - a|| \qquad (\text{by property of infimum}) \\
+		\Rightarrow \eta_A(x) - \eta_A(y) &\le ||x - y||
+	\end{align*}
+	Swapping $x$ and $y$, we get:
+	\[ \eta_A(y) - \eta_A(x) \le ||x - y| \]
+	\[ \Rightarrow |\eta_A(x) - \eta_A(y)| \le ||x - y|| \]
+
+	Let $\epsilon > 0$, then:
+	\[ ||x - y|| < \epsilon \Rightarrow |\eta_A(x) - \eta_A(y)| < \epsilon \]
+	Hence proving that $\eta_A: X \to \mathbb{R}$ is a uniformly continuous function.
+
+\section{Question 13}
+
+	Let $(X, ||\cdot||)$ be a normed linear space, $Y \subseteq X$, and $x \in X \backslash Y$.
+	Then prove the following:
+
+	\begin{enumerate}[label=(\alph*)]
+		\item $x \in \overline{Y} \Leftrightarrow d(x, Y) = 0$
+		\item Let $Y$ be a closed subspace of $X$ and $x \in X \backslash Y$, then $d(x, Y) > 0$.
+	\end{enumerate}
+
+	Proof (a): $x \in \overline{Y} \Rightarrow d(x, Y) = 0$ \\
+	Case 1: $x \in Y$ \\
+	Then trivially $d(x, Y) = 0$. \\
+	Case 2: $x \in Y'$ (the set of limit points of $Y$) \\
+	Suppose $d(x, Y) = a > 0$.
+	Consider the ball $B(x, a / 2)$.
+	Since $x$ is a limit point of $Y$,
+	\[ \exists y \in (B(x, a / 2) \backslash {x}) \cap Y \ne x \]
+	Now, $||y - x|| < a / 2 < a$, which is a contradiction since
+	$a = \text{inf} \{||x - y||: y \in Y\}$.
+	Hence $d(x, Y) = 0$. \\
+
+	Proof (a): $x \in \overline{Y} \Leftarrow d(x, Y) = 0$ \\
+	Let $D = \{||x - y||: y \in Y\}$.
+	We have $d(x, Y) = 0 = \text{inf} ~ D$. \\
+	Case 1: $0 \in \{||x - y||: y \in Y\}$ \\
+	Then, $\exists y \in Y$ such that:
+	\[ ||x - y|| = 0 \Rightarrow x = y \Rightarrow x \in Y \Rightarrow x \in \overline{Y} \]
+	Case 2: $0 \notin \{||x - y||: y \in Y\}$ \\
+	By definition of infimum, $\forall \epsilon > 0 ~ \exists y \in Y$ such that:
+	\[ 0 < ||x - y|| < \epsilon \qquad (x \notin Y) \]
+	\[ \Rightarrow y \in B(x, \epsilon) \Rightarrow x \in Y' \Rightarrow x \in \overline{Y} \] \\
+
+	Proof (b): \\
+	We will prove the equivalent statement: $d(x, Y) = 0 \Rightarrow x \notin X \backslash Y$.
+	From part (a), we have $d(x, Y) = 0 \Rightarrow x \in \overline{Y}$.
+	Since $Y$ is closed, $\overline{Y} = Y \Rightarrow x \in Y$.
+	Hence $x \notin X \backslash Y$.
+
+\section{Question 14}
+
+	Let $(x, +, \cdot)$ be a vector space over $\mathbb{F}$.
+	Let:
+	\[
+		\mathcal{N} = \{||\cdot||: X \to \mathbb{R} \text{ such that }
+		||\cdot|| \text{ is a norm on } X\}
+	\]
+	Let $||\cdot||_a, ||\cdot||_b \in \mathcal{N}$.
+	We say that $||\cdot||_a \sim ||\cdot||_b$ if and only if $\exists c, C > 0$ such that:
+	\[ c ||x||_a \le ||x||_b \le C ||x||_a \quad \forall x \in X \]
+	Prove that $\sim$ is an equivalence relation on $\mathcal{N}$. \\
+
+	It is easy to verify that $\sim$ is reflexive by taking $c = C = 1$.
+
+	Let $||\cdot||_a \sim ||\cdot||_b$.
+	Then, $\exists c, C > 0$ such that:
+	\[ c ||x||_a \le ||x||_b \le C ||x||_a \quad \forall x \in X \]
+	\[
+		\Rightarrow c ||x||_a \le ||x||_b
+		\quad \text{and} \quad
+		||x||_b \le C ||x||_a \quad \forall x \in X
+	\]
+	\[
+		\Rightarrow ||x||_a \le 1/c \cdot ||x||_b
+		\quad \text{and} \quad
+		1/C \cdot ||x||_b \le ||x||_a \quad \forall x \in X
+	\]
+	\[ 1/C \cdot ||x||_b \le ||x||_a \le 1/c \cdot ||x||_b \quad \forall x \in X \]
+	Therefore, $||\cdot||_b \sim ||\cdot||_a$ with $c' = 1/C$ and $C' = 1/c$.
+
+	Now, let $||\cdot||_a \sim ||\cdot||_b$ and $||\cdot||_b \sim ||\cdot||_c$.
+	Then, $\exists c, C > 0$ and $c', C' > 0$ such that:
+	\[ c ||x||_a \le ||x||_b \le C ||x||_a \quad \forall x \in X \]
+	\[ c' ||x||_b \le ||x||_c \le C' ||x||_b \quad \forall x \in X \]
+	\[
+		\Rightarrow c' c ||x||_a \le c' ||x||_b \le ||x||_c
+		\le C'||x||_b \le C' C ||x||_a \quad \forall x \in X
+	\]
+	\[
+		\Rightarrow c' c ||x||_a \le ||x||_c
+		\le C' C ||x||_a \quad \forall x \in X
+	\]
+	Therefore, $||\cdot||_a \sim ||\cdot||_c$ with $c'' = c' c$ and $C'' = C' C$.
+
+	Hence $\sim$ is an equivalence relation on $\mathcal{N}$.
+
+\section{Question 15}
+
+	Prove the following lemma: Let $(X, ||\cdot||_a)$ and $(X, ||\cdot||_b)$ be two normed
+	linear spaces.
+	Assume $||\cdot||_a \sim ||\cdot||_b$.
+	Then, we have the following:
+
+	\begin{enumerate}[label=(\alph*)]
+		\item $\lim_{n \to \infty} x_n = x$ in $(X, ||\cdot||_a)$ if and only if
+		$\lim_{n \to \infty} x_n = x$ in $(X, ||\cdot||_b)$.
+		\item $(x_n)_{n \in \mathbb{N}}$ is a Cauchy sequence in $(X, ||\cdot||_a)$ if and only if
+		$(x_n)_{n \in \mathbb{N}}$ is a Cauchy sequence in $(X, ||\cdot||_b)$.
+		\item Let $K \subseteq X$. Then $K$ is compact in $(X, ||\cdot||_a)$ if and only if
+		$K$ is compact in $(X, ||\cdot||_b)$.
+		Moreover, the map $f: (X, ||\cdot||_a) \to (X, ||\cdot||_b)$ defined by $f(x) = x$ is a
+		homeomorphism.
+	\end{enumerate}
+
+	Proof (a): \\
+	By symmetry, proving one side of the implication suffices.
+	Let $\lim_{n \to \infty} x_n = x$ in $(X, ||\cdot||_a)$.
+	Then, $\forall \epsilon > 0 ~ \exists N \in \mathbb{N}$ such that:
+	\[ ||x_n - x||_a < \epsilon \quad \forall n \ge N \]
+	Since $||\cdot||_a \sim ||\cdot||_b$, $\exists c, C > 0$ such that:
+	\[ c ||y||_a \le ||y||_b \le C ||y||_a \quad \forall y \in X \]
+	Let $y = x_n - x$.
+	Then:
+	\[ ||x_n - x||_b \le C ||x_n - x||_a < C \epsilon \quad \forall n \ge N \]
+	\[ \Rightarrow ||x_n - x||_b < \epsilon' \quad \forall n \ge N \]
+	where $\epsilon' = C \epsilon$.
+	Hence $\lim_{n \to \infty} x_n = x$ in $(X, ||\cdot||_b)$. \\
+
+	Proof (b): \\
+	By symmetry, proving one side of the implication suffices.
+	Let $(x_n)_{n \in \mathbb{N}}$ be a Cauchy sequence in $(X, ||\cdot||_a)$.
+	Then, $\forall \epsilon > 0 ~ \exists N \in \mathbb{N}$ such that:
+	\[ ||x_n - x_m||_a < \epsilon \quad \forall n, m \ge N \]
+	Now,
+	\[ ||x_n - x_m||_b \le C ||x_n - x_m||_a < C \epsilon \quad \forall n, m \ge N \]
+	\[ ||x_n - x_m||_b < \epsilon' \quad \forall n, m \ge N \]
+	where $\epsilon' = C \epsilon$.
+	Hence, $(x_n)_{n \in \mathbb{N}}$ is a Cauchy sequence in $(X, ||\cdot||_b)$. \\
+
+	Proof (c): \\
+	By symmetry, proving one side of the implication suffices. \\
+	Claim: Every open set in $(X, ||\cdot||_a)$ is open in $(X, ||\cdot||_b)$ \\
+	Let $A \subseteq X$ be open in $(X, ||\cdot||_a)$ and $x \in A$.
+	Let $B_a(x, \epsilon)$ denote a ball of radius $\epsilon$ around $x$ in $(X, ||\cdot||_a)$.
+	Since $A$ is open in $(X, ||\cdot||_a)$, $\exists \epsilon > 0$ such that
+	$B_a(x, \epsilon) \subseteq A$.
+	Also, since $||\cdot||_a \sim ||\cdot||_b$, $\exists c, C > 0$ such that:
+	\[ c ||y||_b \le ||y||_a \le C ||y||_b \quad \forall y \in X \]
+	Consider the ball $B_b(x, \epsilon / C)$ in $(X, ||\cdot||_b)$.
+	If $y \in B_b(x, \epsilon / C)$, then:
+	\[ ||y - x||_b < \epsilon / C \]
+	\[ \Rightarrow ||y - x||_a \le C ||y - x||_b < \epsilon \]
+	\[ \Rightarrow y \in B_a(x, \epsilon) \]
+	\[ \Rightarrow B_b(x, \epsilon / C) \subseteq B_a(x, \epsilon) \subseteq A \]
+	Hence $x$ is an interior point of $A$ in $(X, ||\cdot||_b)$ $\forall x \in A$.
+	Therefore $A$ is open in $(X, ||\cdot||_b)$.
+
+	Now, let $K \subseteq X$ be compact in $(X, ||\cdot||_a)$ and let $\mathcal{A}$ be an open
+	cover of $K$ in $(X, ||\cdot||_a)$.
+	Since $K$ is compact, $\exists \mathcal{A}' \subseteq \mathcal{A}$ such that $\mathcal{A}'$
+	is a finite subcover of $K$.
+	By our claim, every open set in $\mathcal{A}$ is also an open cover of $K$ in $(X, ||\cdot||_b)$
+	and hence $\mathcal{A}'$ is a finite subcover of $K$ in $(X, ||\cdot||_b)$.
+	Hence proving $K$ is compact in $(X, ||\cdot||_b)$.
+
+	Now, consider the map $f: (X, ||\cdot||_a) \to (X, ||\cdot||_b)$ defined by $f(x) = x$.
+	$f$ is a homeomorphism if $f$ is bijective, continuous, and has a continuous inverse.
+	We can easily see that $f$ is bijective and $f^{-1} = f$ (but with different domain and
+	co-domain) from the definition.
+	By symmetry, proving the continuity of $f$ suffices.
+	Let $x_0 \in X$ and $\epsilon > 0$.
+	Then:
+	\begin{align*}
+		||f(x) - f(x_0)||_b &= ||x - x_0||_b \quad \forall ||x - x_0||_a < \epsilon \\
+		&\le 1/c \cdot ||x - x_0||_a \\
+		&< \epsilon / c \\
+		\Rightarrow ||f(x) - f(x_0)||_b &< \delta \quad \forall ||x - x_0||_a < \epsilon
+	\end{align*}
+	where $\delta = \epsilon / c$.
+	Hence $f$ is continuous and therefore a homeomorphism.
+
+\section{Question 16}
+
+	Prove that $(\mathbb{F}^n, ||\cdot||_p)$ is a banach space for $ 1\le p \le \infty$. \\
+
+	Let $(x_i)_{i = 1}^n \in \mathbb{F}^n$.
+	By definition:
+	\[ ||(x_i)||_p = \left(\sum_{i = 1}^n |x_i|^p\right) ^ {1/p} \]
+	It is easy to see from the definition that $||(x_i)||_p \ge 0$ and
+	$||(x_i)||_p = 0 \Leftrightarrow (x_i) = \mathbf{0}$ (\textbf{0} represents the 0 vector
+	in $\mathbb{F}^n$).
+
+	Let $\alpha \in \mathbb{F}$.
+	Then:
+	\[
+		||\alpha (x_i)||_p = \left(\sum_{i = 1}^n |\alpha x_i|^p\right) ^ {1/p}
+		= |\alpha| \left(\sum_{i = 1}^n |x_i|^p\right) ^ {1/p}
+	\]
+	\[
+		\Rightarrow ||\alpha (x_i)||_p = |\alpha| \cdot ||(x_i)||_p
+	\]
+	We can verify the triangle inequality using Minkowski's inequality:
+	\begin{align*}
+		||x_i + y_i||_p &= \left(\sum_{i = 1}^n |x_i + y_i|^p\right) ^ {1/p} \\
+		&\le \left(\sum_{i = 1}^n |x_i| + |y_i|^p\right) ^ {1/p} \\
+		&\le \left(\sum_{i = 1}^n |x_i|^p\right) ^ {1/p} + \left(\sum_{i = 1}^n |y_i|^p\right) ^ {1/p} \\
+		&= ||(x_i)||_p + ||(y_i)||_p \\
+		\Rightarrow ||x_i + y_i||_p &\le ||(x_i)||_p + ||(y_i)||_p
+	\end{align*}
+
+	Let $\{(x_i^{(k)})\}_{k \in \mathbb{N}}$ be a cauchy sequence in $(\mathbb{F}^n, ||\cdot||_p)$.
+	Then, $\forall \epsilon > 0 ~ \exists K \in \mathbb{N}$ such that:
+	\[ ||(x_i^{(k)}) - (x_i^{(l)})||_p < \epsilon \quad \forall k, l \ge K \]
+	\[
+		\Rightarrow \left(\sum_{i = 1}^n |x_i^{(k)} - x_i^{(l)}|^p\right) ^ {1/p} < \epsilon
+		\quad \forall k, l \ge K
+	\]
+	\[
+		\Rightarrow |x_i^{(k)} - x_i^{(l)}|^p < \epsilon^p
+		\quad \forall 1 \le i \le n ~ \forall k, l \ge K
+	\]
+	\[
+		\Rightarrow |x_i^{(k)} - x_i^{(l)}| < \epsilon
+		\quad \forall 1 \le i \le n ~ \forall k, l \ge K
+	\]
+	\[ \Rightarrow \{x_i^{(k)}\}_{k \in \mathbb{N}} \text{ is Cauchy in } \mathbb{F} \]
+	Since $\mathbb{F}$ is complete ($\mathbb{F}$ is $\mathbb{R}$ or $\mathbb{C}$),
+	$\{x_i^{(k)}\}_{k \in \mathbb{N}}$ converges to some $x_i \in \mathbb{F}$. \\
+	Claim: $(x_i^{(k)}) \to (x_i)$ \\
+	Since $x_i^{(k)} \to x_i$ in $\mathbb{F}$, $\forall \epsilon > 0 ~ \exists K_i \in \mathbb{N}$
+	such that:
+	\[ |x_i^{(k)} - x_i| < \epsilon \quad \forall k \ge K_i \]
+	Let $K = \max_{1 \le i \le n} K_i$.
+	Then:
+	\begin{align*}
+		||(x_i^{(k)}) - (x_i)||_p &= \left(\sum_{i = 1}^n |x_i^{(k)} - x_i|^p\right) ^ {1/p} \\
+		&< \left(\sum_{i = 1}^n \epsilon^p\right) ^ {1/p} \quad \forall k \ge K \\
+		&= n^{1/p} \epsilon \\
+		\Rightarrow ||(x_i^{(k)}) - (x_i)||_p &< \epsilon' \quad \forall k \ge K
+	\end{align*}
+	where $\epsilon' = n^{1/p} \epsilon$.
+	Hence $(x_i^{(k)}) \to (x_i)$ in $(\mathbb{F}^n, ||\cdot||_p)$.
+
+	Therefore $(\mathbb{F}^n, ||\cdot||_p)$ is complete and a Banach space.
+
+\section{Question 17}
+
+	Prove that $(l^\infty, ||\cdot||_\infty)$ is a banach space. \\
+
+	By definition:
+	\[ l^\infty = \{(x_i)_{i \in \mathbb{N}}: ||(x_i)||_\infty < \infty\} \]
+	where $||(x_i)||_\infty = \sup_{i \in \mathbb{N}} |x_i|$.
+	We can easily see $||(x_i)||_\infty \ge 0$, $||(x_i)||_\infty = 0 \Leftrightarrow
+	(x_i) = \mathbf{0}$, and $||\alpha (x_i)||_\infty = |\alpha| \cdot ||(x_i)||_\infty$.
+
+	Let $(x_i)_{i \in \mathbb{N}}, (y_i)_{i \in \mathbb{N}} \in l^\infty$.
+	Then:
+	\begin{align*}
+		||(x_i) + (y_i)||_\infty &= \sup_{i \in \mathbb{N}} |x_i + y_i| \\
+		&\le \sup_{i \in \mathbb{N}} |x_i| + \sup_{i \in \mathbb{N}} |y_i| \\
+		\Rightarrow ||(x_i) + (y_i)||_\infty &\le ||(x_i)||_\infty + ||(y_i)||_\infty
+	\end{align*}
+	Hence $||\cdot||_\infty$ is a norm.
+
+	Let $\{(x_i^{(k)})\}_{k \in \mathbb{N}}$ be a cauchy sequence in $(l^\infty, ||\cdot||_\infty)$.
+	Then, $\forall \epsilon > 0 ~ \exists K \in \mathbb{N}$ such that:
+	\[ ||(x_i^{(k)}) - (x_i^{(l)})||_\infty < \epsilon \quad \forall k, l \ge K \]
+	\[
+		\Rightarrow \sup_{i \in \mathbb{N}} |x_i^{(k)} - x_i^{(l)}| < \epsilon
+		\quad \forall k, l \ge K
+	\]
+	\[
+		\Rightarrow |x_i^{(k)} - x_i^{(l)}| < \epsilon
+		\quad \forall k, l \ge K ~ \forall 1 \le i \le n
+	\]
+	\[
+		\Rightarrow \{x_i^{(k)}\}_{k \in \mathbb{N}} \text{ is Cauchy in } \mathbb{F}
+		\quad \forall 1 \le i \le n
+	\]
+	Since $\mathbb{F}$ is complete ($\mathbb{F}$ is $\mathbb{R}$ or $\mathbb{C}$),
+	$\{x_i^{(k)}\}_{k \in \mathbb{N}}$ converges to some $x_i \in \mathbb{F}$. \\
+	\[ ||(x_i^{(k)}) - (x_i)||_\infty = \sup_{i \in \mathbb{N}} |x_i^{(k)} - x_i| \]
+	\[ \Rightarrow ||(x_i^{(k)}) - (x_i)||_\infty \to 0 \]
+	since $|x_i^{(k)} - x_i| \to 0 ~ \forall 1 \le i \le n$.
+	Therefore $(x_i^{(k)}) \to (x_i)$ in $(l^\infty, ||\cdot||_\infty)$.
+
+	Hence $(l^\infty, ||\cdot||_\infty)$ is complete and a Banach space.
+
+\section{Question 18}
+
+	Let $K$ be a compact Hausdorff space.
+	Let $C(K) = \{f: K \to \mathbb{F} ~ | ~ f \text{ is continous}\}$.
+	We know that $(C(K), +, \cdot)$ is a vector space.
+	Define $||\cdot||_\infty$ as:
+	\[ ||f||_\infty = \sup_{x \in K} |f(x)| \]
+	$(C(K), ||\cdot||_\infty)$ is a normed linear space. \\
+	Let $f_n \in C(K) ~ \forall x \in \mathbb{N}$ be a Cauchy sequence in
+	$(C(K), ||\cdot||_\infty)$. \\
+	Define $f: K \to \mathbb{F}$ as:
+	\[ f(x) = \lim_{n \to \infty} f_n(x) \quad \forall x \in K \]
+	Prove that $f \in C(K)$ and $||f_n - f||_\infty \to 0$ as $n \to \infty$. \\
+
+	Proof: $||f_n - f||_\infty \to 0$ as $n \to \infty$ \\
+	Since $f_n$ is Cauchy in $C(K)$, $\forall \epsilon > 0 ~ \exists N \in \mathbb{N}$ such that:
+	\[ ||f_n - f_m||_\infty < \epsilon \quad \forall n, m \ge N \]
+	\[
+		\Rightarrow |f_n(x) - f_m(x)| \le ||f_n - f_m||_\infty < \epsilon
+		\quad \forall x \in K ~ \forall n, m \ge N
+	\]
+	\[
+		\Rightarrow \lim_{m \to \infty} |f_n(x) - f_m(x)| < \epsilon
+		\quad \forall x \in K ~ \forall n \ge N
+	\]
+	\[ \Rightarrow |f_n(x) - f(x)| < \epsilon \quad \forall x \in K ~ \forall n \ge N \]
+	\[
+		\Rightarrow |f_n(x) - f(x)| \le ||f_n - f||_\infty < \epsilon
+		\quad \forall x \in K ~ \forall n \ge N
+	\]
+	\[ \Rightarrow ||f_n - f||_\infty < \epsilon \quad \forall n \ge N \]
+	Hence, $||f_n - f||_\infty \to 0$ as $n \to \infty$. \\
+
+	Proof: $f \in C(K)$ \\
+	Let $x_0 \in K$ and $n \in \mathbb{N}$.
+	Then:
+	\begin{align*}
+		|f(x) - f(x_0)| &= |f(x) - f_n(x) + f_n(x) - f_n(x_0) + f_n(x_0) - f(x_0)| \\
+		&\le |f(x) - f_n(x)| + |f_n(x) - f_n(x_0)| + |f_n(x_0) - f(x_0)| \\
+		&\le ||f_n - f||_\infty + |f_n(x) - f_n(x_0)| + ||f_n - f||_\infty \\
+		&\le 2 ||f_n - f||_\infty + |f_n(x) - f_n(x_0)|
+	\end{align*}
+	Let $\epsilon > 0$.
+	Since $||f_n - f||_\infty \to 0$, $\exists N \in \mathbb{N}$ such that:
+	\[ ||f_n - f||_\infty < \epsilon \quad \forall n \ge N \]
+	Also, since $f_n$ is continuous, $\exists \delta_{x_0, n} > 0$ such that:
+	\[ |x - x_0| < \delta_{x_0, n} \Rightarrow |f_n(x) - f_n(x_0)| < \epsilon \]
+	Let $n = N$, then:
+	\begin{align*}
+		|f(x) - f(x_0)| &\le 2 ||f_N - f||_\infty + |f_N(x) - f_N(x_0)| \\
+		&< 2 \epsilon + \epsilon \quad \forall |x - x_0| < \delta_{x_0, N} \\
+		\Rightarrow |f(x) - f(x_0)| &< \epsilon' \quad \forall |x - x_0| < \delta_{x_0, N}
+	\end{align*}
+	where $\epsilon' = 3 \epsilon$.
+	Hence $f$ is continuous at $x_0$, or $f \in C(K)$.
+
+\section{Question 19}
+
+	Let $(X, ||\cdot||)$ be a normed linear space.
+	Show that $B(x, y)$ and $\overline{B}(x, y)$ are convex sets. \\
+
+	Let $t_1, t_2 \in B(x, y)$, $\alpha \in [0, 1]$, and $t = \alpha t_1 + (1 - \alpha) t_2$.
+	Then:
+	\[ ||t_1 - x|| < y \qquad ||t_2 - x|| < y \]
+	\begin{align*}
+		||t - x|| &= ||\alpha t_1 + (1 - \alpha) t_2 - x|| \\
+		&= ||\alpha (t_1 - x) + (1 - \alpha) (t_2 - x)|| \\
+		&\le \alpha ||t_1 - x|| + (1 - \alpha) ||t_2 - x|| \\
+		&< \alpha y + (1 - \alpha) y \\
+		\Rightarrow ||t - x|| &< y
+	\end{align*}
+	Therefore, $t \in B(x, y) ~ \forall \alpha \in [0, 1]$.
+	Hence $B(x, y)$ is convex.
+
+	Now let $t_1, t_2 \in \overline{B}(x, y)$, $\alpha \in [0, 1]$, and
+	$t = \alpha t_1 + (1 - \alpha) t_2$.
+	Then:
+	\[ ||t_1 - x|| \le y \qquad ||t_2 - x|| \le y \]
+	\begin{align*}
+		||t - x|| &= ||\alpha t_1 + (1 - \alpha) t_2 - x|| \\
+		&= ||\alpha (t_1 - x) + (1 - \alpha) (t_2 - x)|| \\
+		&\le \alpha ||t_1 - x|| + (1 - \alpha) ||t_2 - x|| \\
+		&le \alpha y + (1 - \alpha) y \\
+		\Rightarrow ||t - x|| &le y
+	\end{align*}
+	Therefore, $t \in \overline{B}(x, y) ~ \forall \alpha \in [0, 1]$.
+	Hence $\overline{B}(x, y)$ is convex.
+
+\section{Question 20}
+
+	Let $p \in (0, 1)$. Show that $(\mathbb{R}^2, ||\cdot||_p)$ is not a normed linear space. \\
+
+	Let $p = 0.5$ and $x = (1, 0), y = (0, 1) \in \mathbb{R}^2$.
+	Then:
+	\begin{align*}
+		||x + y||_p &= ||(1, 1)||_{0.5} \\
+		&= (1^{0.5} + 1^{0.5}) ^ 2 \\
+		&= 4 \\
+		||x||_p + ||y||_p &= (1^{0.5} + 0^{0.5}) ^ 2 + (0^{0.5} + 1^{0.5}) ^ 2 \\
+		&= 1 + 1 \\
+		&= 2
+	\end{align*}
+	Since $||x + y||_p \nleq ||x||_p + ||y||_p$, $(\mathbb{R}^2, ||\cdot||_p)$ is not a normed
+	linear space.
+
+\section{Question 21}
+
+	Let $X$ be a normed linear space and $A \subseteq X$.
+	Prove that $A$ is bounded if and only if $\exists M > 0$ such that $||x|| \le M$ for
+	all $x \in A$. \\
+
+	Let $A$ be bounded.
+	Suppose $\nexists M > 0$ such that $||x|| \le M$ for all $x \in A$.
+	Then, $\forall M > 0 ~ \exists x \in A$ such that $||x|| > M$.
+	Since $A$ is bounded, $\sup_{x, y \in A} ||x - y|| = M' < \infty$.
+
+	Let $y \in A$.
+	Choose $M > M' + ||y||$.
+	Then $\exists x \in A$ such that $||x|| > M$.
+	\[ ||x|| = ||x - y + y|| \le ||x - y|| + ||y|| \]
+	\[ \Rightarrow ||x - y|| \ge ||x|| - ||y|| > M - ||y|| > M' \]
+	which is a contradiction.
+	Hence $\exists M > 0$ such that $||x|| \le M$ for all $x \in A$.
+
+	Now suppose $\exists M > 0$ such that $||x|| \le M$ for all $x \in A$.
+	Then $\forall x, y \in A$:
+	\[ ||x - y|| \le ||x|| + ||y|| \le 2M \]
+	\[ \Rightarrow \sup_{x, y \in A} ||x - y|| \le 2M < \infty \]
+	Hence $A$ is bounded.
+
+\section{Question 22}
+
+	Show that $S_x$ is closed and bounded in $X$, where $(X, ||\cdot||)$ is a normed linear space
+	and $S_x = \{y \in X: ||y - x|| = 1\}$. \\
+
+	Claim: $S_x$ is bounded. \\
+	Let $y_1, y_2 \in S_x$.
+	Then:
+	\begin{align*}
+		||y_1 - y_2|| &\le ||y_1 - x|| + ||y_2 - x|| \\
+		&= 1 + 1 \\
+		&= 2 \\
+		\Rightarrow ||y_1 - y_2|| &\le 2 \quad \forall y_1, y_2 \in S_x
+	\end{align*}
+	Hence, $S_x$ is bounded.
+
+	Claim: $S_x$ is closed. \\
+	Let $y$ be a limit point of $S_x$.
+	Then, for every neighbourhood $N$ of $y$, $\exists y' \in (N \backslash \{y\}) \cap S_x$. \\
+	Claim: $||y - x|| = 1$ \\
+	Suppose $||y - x|| = d \ne 1$.
+	Consider the neighbourhood $N = \{z \in X: ||z - y|| < |d - 1| / 2\}$.
+	Let $z \in N \ne y$. \\
+	Case 1: $d < 1$ \\
+	\begin{align*}
+		||z - x|| &\le ||z - y|| + ||y - x|| \\
+		&< |d - 1| / 2 + d \\
+		&= (1 - d) / 2 + d \\
+		&= 1 / 2 + d / 2 \\
+		&< 1
+	\end{align*}
+	Hence $z \notin S_x$, which is a contradiction. \\
+	Case 2: $d > 1$ \\
+	\begin{align*}
+		||y - x|| &\le ||y - z|| + ||z - x|| \\
+		\Rightarrow ||z - x|| &\ge ||y - x|| - ||y - z|| \\
+		&> d - 0 \qquad (z \ne y) \\
+		&> 1
+	\end{align*}
+	Hence $z \notin S_x$, which is a contradiction. \\
+
+	Therefore, $||y - x|| = 1 \Rightarrow y \in S_x$ for all limit points $y$ of $S_x$.
+	Hence $S_x$ is closed.
+
+\section{Question 23}
+
+	Let $(X, d)$ be a metric space and $A \subseteq B \subseteq X$.
+	Prove the following:
+
+	\begin{enumerate}[label=(\alph*)]
+		\item $A^0 = \emptyset \Leftrightarrow \overline{A^c} = X$
+		\item $\overline{A} = X \Rightarrow \overline{B} = X$
+		\item $\overline{B} = X$ and $B \subset \overline{A} \Rightarrow \overline{A} = X$
+	\end{enumerate}
+
+	Proof (a): $A^0 = \emptyset \Rightarrow \overline{A^c} = X$ \\
+	Claim: $A \subseteq (A^{c})'$ (where $A'$ denotes the set of limit points of a set $A$). \\
+	Let $x \in A$.
+	Since $A^0 = \emptyset$, for every neighbourhood $N$ of $x$:
+	\[ N \nsubseteq A \Rightarrow N \cap A^c \ne \emptyset \]
+	Also since $x \in A$, $x \notin A^c \Rightarrow (N \backslash \{x\}) \cap A^c \ne \emptyset$
+	for every neighbourhood $N$ of $x$.
+	Hence $x$ is a limit point of $A^c$ for every $x \in A$.
+	$\therefore A \subseteq (A^{c})'$. \\
+	Now, since $\overline{A^c} = A^c \cup (A^c)'$ and $A \subseteq (A^{c})'$, we have
+	$A^c \cup A = X \subseteq \overline{A^c} \Rightarrow \overline{A^c} = X$. \\
+
+	Proof (a): $A^0 = \emptyset \Leftarrow \overline{A^c} = X$ \\
+	We will prove the equivalent statement $A^0 \ne \emptyset \Rightarrow \overline{A^c} \ne X$.
+	Since $A^0 \ne \emptyset$, $\exists x \in A^0$.
+
+	Claim: $x \notin \overline{A^c}$ \\
+	Since $x$ is an interior point, we can find a neighbourhood $N$ of $x$ such that $N \subseteq A$.
+	Then $N \cap A^c = \emptyset \Rightarrow (N \backslash \{x\}) \cap A^c = \emptyset$.
+	Therefore, $x \notin (A^c)'$ ($x$ is not a limit point of $A^c$).
+	Also, because $x \in A$, we have $x \notin A^c$.
+	Since $\overline{A^c} = A^c \cup (A^c)'$, we have $x \notin \overline{A^c}$.
+	Hence, $\overline{A^c} \ne X$. \\
+
+	Proof (b): \\
+	This can be proved by showing that $\overline{A} \subseteq \overline{B}$.
+	Let $x \in \overline{A}$. \\
+	Case 1: $x \in A$ \\
+	\[ x \in A \subseteq B \Rightarrow x \in B \subseteq \overline{B} \]
+	Case 2: $x \in A'$ (set of limit points of A) \\
+	Since $x$ is a limit point of $A$, for every neighbourhood $N$ of $x$ we have $(N \backslash \{x\})
+	\cap A \ne \emptyset$.
+	Since $A \subseteq B$, we have $(N \backslash \{x\}) \cap B \ne \emptyset$.
+	Therefore, $x \in B' \Rightarrow x \in \overline{B}$.
+
+	Hence, $x \in \overline{B} ~ \forall x \in \overline{A} \Rightarrow
+	\overline{A} \subseteq \overline{B}$. \\
+
+	Proof (c): \\
+	Since $B \subset \overline{A}$ and $\overline{B} = X$, we have $\overline{A} = X$ by part (b)
+	$\left(\overline{\overline{A}} = \overline{A}\right)$.
+
+\section{Question 24}
+
+	Prove that $(\mathbb{C}^n, ||\cdot||_2)$ is separable. \\
+
+	Since $\mathbb{Q}$ is countable, $\mathbb{Q}^2$ is also countable.
+	Define the bijection $f: \mathbb{Q}^2 \to (\mathbb{Q} + i \mathbb{Q})$ as $f(x, y) = x + iy$.
+	Therefore, $|(\mathbb{Q} + i \mathbb{Q})| = |\mathbb{Q}^2| \Rightarrow
+	(\mathbb{Q} + i \mathbb{Q})$ is countable.
+	This implies, $(\mathbb{Q} + i \mathbb{Q})^n$ is countable.
+
+	Also, since $\mathbb{Q}$ is dense in $\mathbb{R}$, we have that $(\mathbb{Q} + i \mathbb{Q})$
+	is dense in $\mathbb{C}$.
+	Therefore, $(\mathbb{Q} + i \mathbb{Q})^n$ is dense in $\mathbb{C}^n$.
+
+	Since $(\mathbb{Q} + i \mathbb{Q})^n$ is countable and dense in $(\mathbb{C}^n, ||\cdot||_2)$,
+	by definition $(\mathbb{C}^n, ||\cdot||_2)$ is separable.
+
+\section{Question 25}
+
+	Let $(X, d_1)$ and $(Y, d_2)$ be two metric spaces.
+	Let $f: X \to Y$ be a continuous function.
+	If that X is a separable metric space, prove that $(f(X), d_2)$ is also separable. \\
+
+	Let $D$ be a countable dense subset of $X$.
+	We can easily see that $f(D)$ is also countable.
+
+	Claim: $f(D)$ is dense in $f(X)$. \\
+	Let $y \in f(X)$ and $\epsilon > 0$.
+	By definition, $\exists x \in X$ such that $f(x) = y$.
+	Since $f$ is continuous, $\exists \delta > 0$ such that:
+	\[ d_1(t, x) < \delta \Rightarrow d_2(f(t), y) < \epsilon \]
+	Also because $D$ is dense in $X$, $\exists x_0 \in D$ such that $d_1(x_0, x) < \delta$.
+	Let $y_0 = f(x_0) \in f(D)$.
+	Then $d_2(y_0, y) < \epsilon$.
+
+	Therefore $\forall y \in f(x), \epsilon > 0 ~ \exists y_0 \in f(D)$ such that
+	$d_2(y_0, y) < \epsilon$.
+	Hence $f(D)$ is dense in $f(X)$.
+
+	Since $f(D)$ is a countable dense set in $f(X)$, $(f(X), d_2)$ is separable.
+
+\end{document}

@@ -1,0 +1,185 @@
+\documentclass{article}
+
+% Margins and spacing
+\usepackage[a4paper, margin=.7in]{geometry}
+% Math packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+% Placement of figures, tables, algorithms, etc.
+\usepackage{float}
+% Algorithms
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% No section numbering
+\setcounter{secnumdepth}{0}
+% No paragraph indentation
+\setlength{\parindent}{0pt}
+
+% Define custom commands
+%% Operators
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+%% Manually indented state in algorithmic environment
+\newcommand{\IndentState}{\State \hspace{1em}}
+
+\title{CSCI-570 Homework 3 Solutions}
+\author{
+  Naman Chhibbar \\
+  USC ID: 7709-8548-02
+}
+\date{}
+
+% Document body
+\begin{document}
+\maketitle
+
+\section{Problem 1}
+  Writing the given recurrence in the standard form $T(n) = aT(n/b) + f(n)$, we see that, for algorithm ALG, $a = 12$, $b = 3$, and $f(n) = n^2$.
+  Hence, the exponent of the comparison function given by $n^{\log_b a}$ is:
+  \begin{align*}
+    \log_b a &= \log_3 12 \\
+    &= \log_3 (3 \cdot 4) \\
+    &= 1 + \log_3 4 \approx 2.26
+  \end{align*}
+  It is easy to see that $f(n) = n^2 \in O(n^{\log_b a - \epsilon})$ for $\epsilon = 0.1$ (any value less than 0.2 will work).
+  Hence, we have case 1 of the Master Theorem (leaves dominate).
+  Therefore, $T(n) \in \Theta(n^{\log_3 12})$. \\
+
+  For ALG', we have the recurrence $T'(n) = aT'(n/9) + n^2$.
+  By Master Theorem's case 3 (root dominates), we know that the best possible asymptotic running time for ALG' is $T'(n) \in \Theta(n^2)$.
+  For this, we need $f(n) = n^2 \in \Omega(n^{\log_9 a + \epsilon})$ ($b = 9$ in this case) for some $\epsilon > 0$.
+  This can be easily achieved by solving:
+  \begin{align*}
+    \log_9 a &< 2 \\
+    \Rightarrow a &< 9^2 = 81
+  \end{align*}
+  Hence, for $a < 81$, ALG' is asymptotically faster than ALG with a runtime of $\Theta(n^2)$.
+
+\section{Problem 2}
+  Mathematically, the recurrence we have is $T(n) = 2T(n - 1) + c$, where $c$ is the constant time taken at each level of the recursion.
+  Unrolling the recurrence:
+  \begin{align*}
+    T(n) &= 2T(n - 1) + c \\
+    &= 2(2T(n - 2) + c) + c \\
+    &= 2^2 T(n - 2) + (1 + 2)c \\
+    &= 2^2 (2T(n - 3) + c) + (1 + 2)c \\
+    &= 2^3 T(n - 3) + (1 + 2 + 2^2)c \\
+    &\vdots \\
+    &= 2^n T(0) + (1 + 2 + 2^2 + \ldots + 2^{n - 1})c \\
+    &= 2^n T(0) + (2^n - 1)c \\
+    &\in \Theta(2^n)
+  \end{align*}
+  Another quick way to see this is to use the Master Theorem.
+  Using the substitution $n = \log k$ (any base $> 1$ will work, but we use base 2 for simplicity) and defining $U(k) = T(\log k)$, we get the new recurrence:
+  \begin{align*}
+    T(\log k) &= 2T(\log k - 1) + c \\
+    &= 2T(\log (k / 2)) + c \\
+    \Rightarrow U(k) &= 2U(k / 2) + c
+  \end{align*}
+  Here, $a = 2$, $b = 2$, and $f(k) = c$.
+  Since $f$ is a constant, we have case 1 of the Master Theorem (leaves dominate).
+  Therefore, $U(k) \in \Theta(k^{\log_2 2}) = \Theta(k)$.
+  Substituting back, we get $T(n) = U(2^n) \in \Theta(2^n)$.
+
+\section{Problem 3}
+  We have the recurrence $T(n) = 5T(n/2) + cn$, where $cn$ ($c > 0$) is the linear time taken to combine the solutions.
+  For simplicity, we will substitute $n = 2^k$ and define $U(k) = T(2^k)$.
+  This gives us the new recurrence:
+  \begin{align*}
+    T(2^k) &= 5T\left(\frac{2^k}{2}\right) + c \cdot 2^k \\
+    &= 5T(2^{k - 1}) + c \cdot 2^k \\
+    \Rightarrow U(k) &= 5U(k - 1) + c \cdot 2^k \\
+    &= 5(5U(k - 2) + c \cdot 2^{k - 1}) + c \cdot 2^k \\
+    &= 5^2 U(k - 2) + (2^k + 5 \cdot 2^{k - 1})c \\
+    &= 5^2 (5U(k - 3) + c \cdot 2^{k - 2}) + (2^k + 5 \cdot 2^{k - 1})c \\
+    &= 5^3 U(k - 3) + (2^k + 5 \cdot 2^{k - 1} + 5^2 \cdot 2^{k - 2})c \\
+    &\vdots \\
+    &= 5^k U(0) + (2^k + 5 \cdot 2^{k - 1} + \ldots + 5^{k - 1} \cdot 2)c \\
+    &= 5^k U(0) + c \cdot 2^k \cdot \frac{(5/2)^k - 1}{5/2 - 1} \\
+    &= 5^k U(0) + \frac{2c}{3} \cdot (5^k - 2^k) \\
+    &\in \Theta(5^k) \\
+    \Rightarrow T(n) &\in \Theta(5^{\log_2 n}) = \Theta(n^{\log_2 5})
+  \end{align*}
+
+\section{Problem 4}
+  Here is the required algorithm:
+  \begin{algorithm}
+    \caption{Determine if an array has a majority element}
+    \begin{algorithmic}
+      \State \textbf{Input:} Array $A$ of $n$ postive integers
+      \State \textbf{Output:} Majority element if it exists, else -1
+      \Function{MajorityElement}{$A, n$}
+        \If{$n = 1$}
+          \State \Return $A[0]$
+        \EndIf
+        \State $mid \gets \lfloor n / 2 \rfloor$
+        \State $left \gets$ \Call{MajorityElement}{$A[0:mid-1], mid$}
+        \State $right \gets$ \Call{MajorityElement}{$A[mid:n-1], n - mid$}
+        \If{$left = right$}
+          \State \Return $left$
+        \EndIf
+        \State $left\_count \gets 0$
+        \State $right\_count \gets 0$
+        \For{$i = 0$ to $n - 1$}
+          \If{$A[i] = left$}
+            \State $left\_count \gets left\_count + 1$
+          \ElsIf{$A[i] = right$}
+            \State $right\_count \gets right\_count + 1$
+          \EndIf
+        \EndFor
+        \If{$left\_count > n / 2$}
+          \State \Return $left$
+        \ElsIf{$right\_count > n / 2$}
+          \State \Return $right$
+        \Else
+          \State \Return -1
+        \EndIf
+      \EndFunction
+    \end{algorithmic}
+  \end{algorithm}
+
+  where $A[i:j]$ denotes the subarray of $A$ from index $i$ to $j$ (both inclusive).
+  The algorithm recursively divides the array into two halves to get the majority elements from both.
+  The base case being $n = 1$, in which the majority element is the only element present.
+  If both halves have the same majority element, it is the majority element for the whole array (since its total count in both the halves is more than $n/4 \times 2 = n/2$).
+  If not, both the majority elements can be the majority element for the whole array, so we count their occurrences in the entire array to check the same.
+  The recurrence relation for the runtime is $T(n) = 2T(n/2) + O(n) \in O(n \log n)$ (by Master's Theorem).
+
+\section{Problem 5}
+  The required algorithm is as follows:
+  \begin{algorithm}
+    \caption{2D Binary Search}
+    \begin{algorithmic}
+      \State \textbf{Input:} A 2D matrix $A$ of size $n \times m$ with sorted rows and columns, key $k$ to find
+      \State \textbf{Output:} \texttt{True} if $k$ is present in $A$, else \texttt{False}
+      \Function{BinarySearch2D}{$A, n, m, k$}
+        \If{$n = 0$ or $m = 0$}
+          \State \Return \texttt{False}
+        \EndIf
+        \State $mid\_row \gets \lfloor n / 2 \rfloor$
+        \State $mid\_col \gets \lfloor m / 2 \rfloor$
+        \If{$A[mid\_row][mid\_col] = k$}
+          \State \Return \texttt{True}
+        \ElsIf{$A[mid\_row][mid\_col] > k$}
+          \State \Return \Call{BinarySearch2D}{$A[0:mid\_row-1][mid\_col:m-1], mid\_row, m - mid\_col, k$} $\lor$
+          \Statex \hspace{4em} \Call{BinarySearch2D}{$A[0:mid\_row-1][0:mid\_col-1], mid\_row, mid\_col, k$} $\lor$
+          \Statex \hspace{4em} \Call{BinarySearch2D}{$A[mid\_row:n-1][0:mid\_col-1], n - mid\_row, mid\_col, k$}
+        \Else
+          \State \Return \Call{BinarySearch2D}{$A[mid\_row+1:n-1][0:mid\_col], n - mid\_row - 1, mid\_col + 1, k$} $\lor$
+          \Statex \hspace{4em} \Call{BinarySearch2D}{$A[mid\_row+1:n-1][mid\_col+1:m-1], n - mid\_row - 1, m - mid\_col - 1, k$} $\lor$
+          \Statex \hspace{4em} \Call{BinarySearch2D}{$A[0:mid\_row][mid\_col+1:m-1], mid\_row + 1, m - mid\_col - 1, k$}
+        \EndIf
+      \EndFunction
+    \end{algorithmic}
+  \end{algorithm}
+
+  where $A[i:j][p:q]$ denotes the submatrix of $A$ from row index $i$ to $j$ and column index $p$ to $q$ (all indices inclusive) and $\lor$ denotes the logical OR operation.
+  This algorithm is more generalized than required, taking an $n \times m$ matrix as input.
+  This algorithm works by comparing the key with the middle element of the matrix and searching the three quadrants of the matrix (we call the function on three quadrants of the matrix instead of two since the elements before the middle element in the same row or column can be equal to it and hence the key can be present in two extra quadrants).
+  For asymptotic runtime analysis, we can assume $m = n$.
+  The recurrence relation for the runtime is $T(n) = 3T(n/2) + O(1)$ (abusing the big-O notation a little).
+  We can easily see that the leaves of the recursion dominate (since we do just a constant amount of work at each level).
+  Hence, $T(n) \in O(n^{\log_{2}{3}}) \approx O(n^{1.585})$ (by Master's Theorem), which is better than $O(n^2)$.
+
+\end{document}

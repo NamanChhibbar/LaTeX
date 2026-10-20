@@ -1,0 +1,170 @@
+\documentclass{article}
+
+% Margins and spacing
+\usepackage[a4paper, margin=.7in]{geometry}
+% Math packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+% Placement of figures, tables, algorithms, etc.
+\usepackage{float}
+% Algorithms
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% No section numbering
+\setcounter{secnumdepth}{0}
+% No paragraph indentation
+\setlength{\parindent}{0pt}
+
+% Define custom commands
+%% Operators
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+%% Manually indented state in algorithmic environment
+\newcommand{\IndentState}{\State \hspace{1em}}
+
+\title{CSCI-570 Homework 5 Solutions}
+\author{
+  Naman Chhibbar \\
+  USC ID: 7709-8548-02
+}
+\date{}
+
+% Document body
+\begin{document}
+\maketitle
+
+\section{Problem 1}
+  We can easily order the finish time by using an efficient sorting algorithm (like merge sort) that runs in $O(n\log n)$ time. \\
+  For a given interval with index $j$, an interval with index $i < j$ is disjoint with $j$ iff $f_i \leq s_j$ (assuming the finish times have been sorted).
+  Thus, we can easily find $p(j)$ by scanning the intervals with indices $0, 1, \dots, j-1$, which can be done in $O(j)$ time.
+  Since $j < n$, computing $p(j)$ takes $O(n)$ time for all $j \in \{0, 1, \dots, n-1\}$.
+  Here is the algorithm:
+  \begin{algorithm}
+    \caption{Calculating $p(j)$}
+    \begin{algorithmic}[1]
+      \State \textbf{Input:} Array $intervals$ of tuples of the form $(s_i, f_i, w_i)$, number of intervals $n$, an index $j$
+      \State \textbf{Output:} $p(j)$
+      \For{$i = j - 1 \to 0$}
+        \If{$f_i \leq s_j$}
+          \State $p \gets i$
+          \State \textbf{break}
+        \EndIf
+      \EndFor
+      \State \textbf{return} $p$
+    \end{algorithmic}
+  \end{algorithm}
+
+\section{Problem 2}
+  Let $S(n, m)$ denote the total number of ways to build a stable tower of height $n$ using $m$ different sizes of blocks with each size having $k$ blocks.
+  We can see that $S$ follows the following recurrence:
+  \[ S(n, m) = \sum_{i=0}^{\min\{k, n\}} S(n - i, m - 1) \]
+  with the base case:
+  \[ S(n, 1) =
+  \begin{cases}
+    1 & n \leq k \\
+    0 & n > k
+  \end{cases} \]
+  Here is the algorithm that implements this:
+  \begin{algorithm}[H]
+    \caption{Number of Stable Towers}
+    \begin{algorithmic}[1]
+      \State \textbf{Input:} Height of tower $n$, number of different block sizes $m$, number of blocks of each size $k$
+      \State \textbf{Output:} Total number of stable towers $S(n, m)$
+      \State Initialize $a \gets \min\{k, n\}$
+      \State Initialize 2D array $S$ of size $n \times m$ with all values $0$
+      \For{$i = 0 \to (n - 1)$}
+        \If{$i + 1 \leq k$}
+          \State $S[i][0] \gets 1$
+        \EndIf
+      \EndFor
+      \For{$i = 1 \to (n - 1)$}
+        \For{$j = 0 \to (m - 1)$}
+          \For{$l = 0 \to a$}
+            \If{$i - l \geq 0$}
+              \State $S[i][j] \gets S[i][j] + S[i - l][j - 1]$
+            \EndIf
+          \EndFor
+        \EndFor
+      \EndFor
+      \State \textbf{return} $S[n - 1][m - 1]$
+    \end{algorithmic}
+  \end{algorithm}
+
+  We can see that we have three nested loops here, which makes the time complexity of this algorithm $O(n \cdot m \cdot \min\{k, n\})$.
+
+\section{Problem 3}
+  We will solve this problem by greedily selecting the last possible gas station on our route.
+  Formally, suppose we are at the $i$th gas station ($i = 0$ means we are at USC).
+  Then, we will stop at the $k$th gas station, where $k$ is:
+  \[ k = \max\{j: j \in \{i+1, \dots, n\}, d_j - d_i \leq m\} \]
+  In the formula above, we need to subtract $d_i$ since all the distances are from USC.
+  Now, we will prove that this gives us one of the optimal solutions. \\
+  Proof by contradiction: \\
+  Suppose we get that we should stop at the gas stations $g_1, g_2, \dots, g_t$ and one of the optimal solutions is $g_1', g_2', \dots, g_{t'}'$ with $t' < t$. \\
+  Claim: $g_i' \leq g_i ~ \forall i \in \{1, 2, \dots, t'\}$ \\
+  We will prove this using induction on $i$:
+  \begin{itemize}
+    \item Base case: $i = 1$ \\
+      Since we are selecting the farthest gas station we can reach from USC, it is clear that $g_1' \leq g_1$.
+    \item Induction hypothesis: Assume that $g_i' \leq g_i ~ \forall i \in \{1, 2, \dots, k\}$ for some $k \geq 1$.
+    \item Induction step: We need to show that $g_{k+1}' \leq g_{k+1}$. \\
+      Since we have $g_k' \leq g_k$ and we know that the farthest gas station we can reach from $g_k$ is $g_{k+1}$, it is clear that the farthest gas station we can reach from $g_k'$ is at most $g_{k+1}$, i.e. $g_{k+1}' \leq g_{k+1}$.
+  \end{itemize}
+  Thus, by induction, our claim holds.
+  Using this claim, we can see that $g_{t'}' \leq g_{t'}$.
+  We know that it is not possible to reach Santa Monica from gas station $g_{t'}'$ since we need to stop at or before gas station $g_{t'+1}$ as per our algorithm.
+  This means that the presumed optimal solution is not valid, which is a contradiction.
+  Hence our algorithm provides an optimal solution. \\
+  Here is the complete algorithm:
+  \begin{algorithm}[H]
+    \caption{Minimum Gas Stops}
+    \begin{algorithmic}[1]
+      \State \textbf{Input:} Array $D$ of distances of gas stations, number of gas stations $n$, maximum distance $m$ that can be travelled on a full tank
+      \State \textbf{Output:} List of gas stations where we need to stop
+      \State Initialize array $stops \gets [~]$
+      \State Initialize $current \gets 0$
+      \State \textbf{return} $stops$
+      \While{$current < n$}
+        \For{$i = current + 2 \to n$}
+          \If{$D[i] - D[current] > m$}
+            \State Initialize $next \gets i - 1$
+            \State \textbf{break}
+          \EndIf
+        \EndFor
+      \EndWhile
+    \end{algorithmic}
+  \end{algorithm}
+
+  Here, we take advantage of the fact that the distances between adjacent gas stations and USC is at most $m$ and start the counter for $i$ on line 7 from $current + 2$.
+  Also, although having two nested loops, we iterate over each element of $D$ exactly once and do a constant amount of work for each element.
+  Hence, the time complexity of this algorithm is $O(n)$.
+
+\section{Problem 4}
+  We will prove that this algorithm gives an optimal solution by induction on $|V|$, where $|V|$ is the cardinality of $V$ (also the number of vertices). \\
+  Base case: $|V| = 1$ \\
+  It is trivial that our algorithm finds the optimal solution in this case. \\
+  Induction hypothesis: Assume that our algorithm finds the optimal solution for binary trees with $|V| \le n$ for some $n \geq 1$. \\
+  Induction step: We need to show that our algorithm finds the optimal solution for binary trees with $|V| = n + 1$. \\
+  Claim: Let $v \in V$ be a random leaf.
+  Then, there exists an optimal solution $S$ such that $v \in S$. \\
+  Proof: Let $S$ be any optimal solution.
+  If $v \in S$, we are done.
+  Now, if $v \notin S$ then the parent of $v$ must be in $S$.
+  If not, then $S \cup \{v\}$ will also be a valid solution, contradicting the optimality of $S$.
+  Hence, $p \in S$, where $p$ is the parent of $v$.
+  Now, we can easily see that $(S' = S \setminus \{p\}) \cup \{v\}$ is also a valid solution containing $v$.
+  Hence, our claim holds. \\
+  Now, our algorithm chooses a random leaf $v$ and adds it to the solution set $S$.
+  By our claim, we know that there exists an optimal solution $S'$ such that $v \in S'$. \\
+  Claim: $S' \setminus \{v\}$ is an  optimal solution for the binary tree $T'$ obtained by removing $v$ and its parent from $T$. \\
+  Proof: Suppose $S' \setminus \{v\}$ is not an optimal solution for $T'$.
+  Then, there exists a solution $R$ for $T'$ such that $|R| > |S' \setminus \{v\}|$.
+  Note that since $T'$ does not contain $v$ and its parent, $R \cup \{v\}$ is a valid solution for $T$.
+  Since $|R| > |S' \setminus \{v\}|$, it contradicts the optimality of $S'$.
+  Therefore, our claim must be true. \\
+  Since $S' \setminus \{v\}$ is an optimal solution for $T'$, by the induction hypothesis, our algorithm finds an optimal solution $S''$ with $|S''| = |S' \setminus \{v\}|$ making $S'' \cup \{v\}$ an optimal solution for $T$.
+  Hence, our algorithm finds an optimal solution for binary trees with $|V| = n + 1$. \\
+  Thus, by induction, our algorithm finds an optimal solution for all binary trees. \\
+
+\end{document}

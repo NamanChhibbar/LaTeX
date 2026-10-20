@@ -1,0 +1,256 @@
+\documentclass{article}
+\usepackage[a4paper, margin=.7in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{nameref}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% No section numbering
+\setcounter{secnumdepth}{0}
+% No paragraph indentation
+\setlength{\parindent}{0pt}
+
+% Define custom commands
+%% Bold-italic math symbols
+\newcommand{\mbi}[1]{\boldsymbol{#1}}
+%% Manually indented state in algorithmic environment
+\newcommand{\IndentState}{\State \hspace{1em}}
+\newcommand{\DIndentState}{\State \hspace{2em}}
+%% Operators
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\relu}{ReLU}
+\DeclareMathOperator{\sgn}{SGN}
+
+\title{CSCI-567 Assignment 2 Solutions}
+\author{
+  Naman Chhibbar \\
+  USC ID: 7709-8548-02
+}
+\date{}
+
+% Document body
+\begin{document}
+\maketitle
+
+\section{Problem 1}
+  \begin{itemize}
+    \item[\textbf{1.1}] Since $\mbi{w}_1^T \mbi{x}_n, \dots, \mbi{w}_C^T \mbi{x}_n$ are distinct $\forall n \in [N]$, we can find $y' = \argmax_{y \ne y_n} \mbi{w}_y^T \mbi{x}_n \in [C]$.
+    Now, $F_n$ will simply be:
+    \[ F_n(\mbi{w}_1, \dots, \mbi{w}_C) = \max\left\{ 0, \mbi{w}_{y'}^T \mbi{x}_n - \mbi{w}_{y_n}^T \mbi{x}_n \right\} \]
+    It is easy to see that $F_n$ is not dependent on $\mbi{w}_c$ when $c \notin \{y', y_n\}$.
+    Hence:
+    \[ \frac{\partial F_n}{\partial \mbi{w}_c} = 0 \quad \forall c \ne y', y_n \]
+    Further, if $\mbi{w}_{y'}^T \mbi{x}_n \le \mbi{w}_{y_n}^T \mbi{x}_n$, then $F_n = 0$ and hence:
+    \[ \frac{\partial F_n}{\partial \mbi{w}_c} = 0 \quad \forall c \in [C] \]
+    Otherwise:
+    \begin{align*}
+      &\frac{\partial F_n}{\partial \mbi{w}_{y_n}} = -\mbi{x}_n &\frac{\partial F_n}{\partial \mbi{w}_{y'}} &= \mbi{x}_n
+    \end{align*}
+
+    \item[\textbf{1.2}] For SGD, we define the stochastic gradient $\tilde{\nabla} F(\mbi{w}_1, \dots, \mbi{w}_C) = \nabla F_I(\mbi{w}_1, \dots, \mbi{w}_C)$, where $I$ is a random variable uniformly distributed over $[N]$.
+    Assuming $\eta > 0$ be the learning rate, SGD for multiclass classification is:
+    \begin{algorithm}
+      \caption{Multiclass Perceptron}
+      \begin{algorithmic}[1]
+        \State \textbf{Input:} A training set $(\mbi{x}_1, y_1), \dots, (\mbi{x}_N, y_N)$
+        \State \textbf{Initialization:} $\mbi{w}_1 = \dots = \mbi{w}_C = \mbi{0}$
+        \State \textbf{Repeat} until convergence:
+        \IndentState Randomly choose $n \in [N]$
+        \IndentState $y' \gets \argmax_{y \ne y_n} \mbi{w}_y^T \mbi{x}_n$
+        \IndentState \textbf{if} $\mbi{w}_{y'}^T \mbi{x}_n \le \mbi{w}_{y_n}^T \mbi{x}_n$ \textbf{then} Repeat from step 4
+        \IndentState $\mbi{w}_{y'} \gets \mbi{w}_{y'} - \eta \mbi{x}_n$
+        \IndentState $\mbi{w}_{y_n} \gets \mbi{w}_{y_n} + \eta \mbi{x}_n$
+        \State \textbf{Output:} $\mbi{w}_1, \dots, \mbi{w}_C$
+      \end{algorithmic}
+    \end{algorithm}
+
+    \item[\textbf{1.3}] As told in the question, we will have $\mbi{w}_c = \sum_{m=1}^N \alpha_{c,m} \mbi{\phi}(\mbi{x}_m) ~ \forall c \in [C]$ (after training) after the feature transformation using $\mbi{\phi}$, where $\alpha_{c,m} \in \mathbb{R}$.
+    Let $k(\cdot, \cdot)$ be the corresponding kernel function.
+    Now, for any $c \in [C]$ and $n \in [N]$, we can calculate:
+    \begin{align*}
+      \mbi{w}_c^T \mbi{\phi}(\mbi{x}_n) &= \left( \sum_{m=1}^N \alpha_{c,m} \mbi{\phi}(\mbi{x}_m) \right)^T \mbi{\phi}(\mbi{x}_n) \\
+      &= \sum_{m=1}^N \alpha_{c,m} \mbi{\phi}(\mbi{x}_m)^T \mbi{\phi}(\mbi{x}_n) \\
+      &= \sum_{m=1}^N \alpha_{c,m} k(\mbi{x}_m, \mbi{x}_n)
+    \end{align*}
+    For simplicity, define $g: [C] \times [N] \to \mathbb{R}$ as $g(c, n) = \mbi{w}_c^T \mbi{\phi}(\mbi{x}_n)$.
+    Note that evaluating $g(c, n)$ does not require computing $\mbi{\phi}(\mbi{x}_n)$.
+    Hence, the modified SGD algorithm is:
+    \begin{algorithm}
+      \caption{Multiclass Perceptron with kernel function $k(\cdot, \cdot)$}
+      \begin{algorithmic}[1]
+        \State \textbf{Input:} A training set $(\mbi{x}_1, y_1), \dots, (\mbi{x}_N, y_N)$
+        \State \textbf{Initialize:} $\alpha_{c,n} = 0$ for all $c \in [C]$ and $n \in [N]$
+        \State \textbf{Repeat} until convergence:
+        \IndentState Randomly choose $n \in [N]$
+        \IndentState $y' \gets \argmax_{y \ne y_n} g(y, n)$
+        \IndentState \textbf{if} $g(y', n) \le g(y_n, n)$ \textbf{then} Repeat from step 4
+        \IndentState $\alpha_{y', n} \gets \alpha_{y', n} - \eta$
+        \IndentState $\alpha_{y_n, n} \gets \alpha_{y_n, n} + \eta$
+        \State \textbf{Output:} $\alpha_{c,n} ~ \forall n \in [N], c \in [C]$
+      \end{algorithmic}
+      
+    \end{algorithm}
+  \end{itemize}
+  
+\section{Problem 2}
+  \begin{itemize}
+    \item[\textbf{2.1}] Since we know $\sigma(z) = \frac{1}{1 + e^{-z}}$, we can rewrite the loss function as:
+    \begin{align*}
+      \ell &= \ln(1 + \exp(-y\hat{y})) \\
+      &= \ln\left(\frac{1}{\sigma(\hat{y}y)}\right) \\
+      &= -\ln \sigma(\hat{y}y) \\
+    \end{align*}
+    Derivative of $\sigma(z)$ is:
+    \begin{align*}
+      \sigma'(z) &= \frac{d}{dz} \left(\frac{1}{1 + e^{-z}}\right) \\
+      &= \frac{-1}{(1 + e^{-z})^2} \cdot -e^{-z} \\
+      &= \frac{e^{-z}}{(1 + e^{-z})^2} \\
+      &= \frac{1}{1 + e^{-z}} \cdot \left(1 - \frac{1}{1 + e^{-z}}\right) \\
+      &= \sigma(z) (1 - \sigma(z))
+    \end{align*}
+    Calculating $\partial\ell/\partial\hat{y}$:
+    \begin{align*}
+      \frac{\partial\ell}{\partial\hat{y}} &= \frac{\partial}{\partial\hat{y}} \left(-\ln \sigma(\hat{y}y)\right) \\
+      &= -\frac{1}{\sigma(\hat{y}y)} \cdot \sigma'(\hat{y}y) \cdot y \\
+      &= -\frac{1}{\sigma(\hat{y}y)} \cdot \sigma(\hat{y}y) (1 - \sigma(\hat{y}y)) \cdot y \\
+      &= -y (1 - \sigma(\hat{y}y))
+    \end{align*}
+
+    \item[\textbf{2.2}] Having calculated $\partial\ell/\partial\hat{y}$, we can now easily calculate $\partial\ell/\partial v_i$ for $i \in \{1, 2\}$ as:
+    \[ \frac{\partial\ell}{\partial v_i} = \frac{\partial\ell}{\partial\hat{y}} \cdot \frac{\partial\hat{y}}{\partial v_i} \]
+    Since $\hat{y} = o_1v_1 + o_2v_2$, we have $\partial\hat{y}/\partial v_i = o_i$.
+    \[ \therefore \frac{\partial\ell}{\partial v_i} = \frac{\partial\ell}{\partial\hat{y}} \cdot o_i \quad \forall i \in \{1, 2\} \]
+
+    \item[\textbf{2.3}] Since $a_1 = x_1w_1 + x_2w_2$ and $a_2 = x_2w_1 + x_3w_2$, we have:
+    \[ \frac{\partial\ell}{\partial w_i} = \frac{\partial\ell}{\partial a_1} \frac{\partial a_1}{\partial w_i} + \frac{\partial\ell}{\partial a_2} \frac{\partial a_2}{\partial w_i} \quad \forall i \in \{1, 2\} \]
+    since $\ell$ is a function of both $a_1$ and $a_2$.
+    Note that we can cleverly write $\partial a_1/\partial w_i = x_i$ and $\partial a_2/\partial w_i = x_{i+1}$.
+    \[ \therefore \frac{\partial\ell}{\partial w_i} = \frac{\partial\ell}{\partial a_1} x_i + \frac{\partial\ell}{\partial a_2} x_{i+1} \quad \forall i \in \{1, 2\} \]
+
+    \item[\textbf{2.4}] For $i \in \{1, 2\}$, we have:
+    \[ \frac{\partial\ell}{\partial a_i} = \frac{\partial\ell}{\partial\hat{y}} \frac{\partial\hat{y}}{\partial a_i} \]
+    Now:
+    \begin{align*}
+      \hat{y} &= o_1v_1 + o_2v_2 \\
+      &= \relu(a_1)v_1 + \relu(a_2)v_2 \\
+      \Rightarrow \frac{\partial\hat{y}}{\partial a_i} &= v_i \cdot \frac{\partial}{\partial a_i} \relu(a_i) \\
+      &= v_i \cdot \mathbb{I}[a_i > 0] \\
+      \therefore \frac{\partial\ell}{\partial a_i} &= \frac{\partial\ell}{\partial\hat{y}} \cdot v_i \cdot \mathbb{I}[a_i > 0] \quad \forall i \in \{1, 2\}
+    \end{align*}
+
+    \item[\textbf{2.5}] The required algorithm is:
+    \begin{algorithm}
+      \caption{Backpropagation for the above mini CNN}
+      \begin{algorithmic}[1]
+        \State \textbf{Input:} A training set $(\mbi{x}_1, y_1), \dots, (\mbi{x}_N, y_N)$, learning rate $\eta$
+        \State \textbf{Initialize:} set $w_1, w_2, v_1, v_2$ randomly
+        \State \textbf{Repeat} until convergence:
+        \IndentState randomly pick an example $(\mbi{x}_n, y_n)$ (the three features of $\mbi{x}_n$ are denoted by $x_{n1}, x_{n2}, x_{n3}$)
+        \IndentState Forward propagation:
+        \DIndentState $a_1 \gets x_1w_1 + x_2w_2$
+        \DIndentState $a_2 \gets x_2w_1 + x_3w_2$
+        \DIndentState $o_1 \gets \relu(a_1)$
+        \DIndentState $o_2 \gets \relu(a_2)$
+        \DIndentState $\hat{y} \gets o_1v_1 + o_2v_2$
+        \DIndentState $\ell \gets \ln(1 + \exp(-y_n\hat{y}))$
+        \IndentState Backward propagation:
+        \DIndentState $v_1 \gets v_1 + \eta \cdot o_1 y_n (1 - \sigma(\hat{y}y_n))$
+        \DIndentState $v_2 \gets v_2 + \eta \cdot o_2 y_n (1 - \sigma(\hat{y}y_n))$
+        \DIndentState $w_1 \gets w_1 + \eta \cdot y_n (1-\sigma(\hat{y}y_n)) (x_1v_1\mathbb{I}[a_1 > 0] + x_2v_2\mathbb{I}[a_2 > 0])$
+        \DIndentState $w_2 \gets w_2 + \eta \cdot y_n (1-\sigma(\hat{y}y_n)) (x_2v_1\mathbb{I}[a_1 > 0] + x_3v_2\mathbb{I}[a_2 > 0])$
+        \State \textbf{Output:} $w_1, w_2, v_1, v_2$
+      \end{algorithmic}
+    \end{algorithm}
+  \end{itemize}
+  
+\section{Problem 3}
+  \begin{itemize}
+    \item[\textbf{3.1}] No, these points can not be separated by such a linear classifier.
+    Let our model be $\hat{y} = \sgn(wx + b)$, where the signum function $\sgn(z)$ is defined as:
+    \[ \sgn(z) = \begin{cases}
+      1 & z \ge 0 \\
+      -1 & z < 0
+    \end{cases} \]
+    since 0 is not a label.
+    We can safely assume that $w \ne 0$, since if $w = 0$ then will give a constant output and will not be able to separate the points.
+    Also, note that $wx + b$ is strictly monotonic in $x$ (monotonically increasing or decreasing depending on $w$) since $w \ne 0$.
+    Hence, if $w > 0$ and $\hat{y}_3 = \sgn(wx_3 + b) = 1$, then $\hat{y}_2 = \sgn(wx_2 + b) = 1$ (since $x_3 < x_2$) and is misclassified.
+    Similarly, if $w < 0$ and $\hat{y}_1 = \sgn{wx_1 + b} = -1$, then $\hat{y}_3 = \sgn{wx_3 + b} = -1$ (since $x_1 < x_3$) and is misclassified.
+    Therefore, no such linear classifier exists.
+
+    \item[\textbf{3.2}] Finding the kernel function of $\mbi{\phi}$:
+    \begin{align*}
+      k(x_1, x_2) &= \mbi{\phi}(x_1)^T \mbi{\phi}(x_2) \\
+      &= \begin{bmatrix}
+        x_1 & x_1^2
+      \end{bmatrix}
+      \cdot
+      \begin{bmatrix}
+        x_2 \\
+        x_2^2
+      \end{bmatrix} \\
+      &= x_1x_2 + x_1^2x_2^2 \\
+    \end{align*}
+    The Gram matrix for the given data is:
+    \begin{align*}
+      K &= \begin{bmatrix}
+        k(x_1, x_1) & k(x_1, x_2) & k(x_1, x_3) \\
+        k(x_2, x_1) & k(x_2, x_2) & k(x_2, x_3) \\
+        k(x_3, x_1) & k(x_3, x_2) & k(x_3, x_3)
+      \end{bmatrix} \\
+      &= \begin{bmatrix}
+        2 & 0 & 0 \\
+        0 & 2 & 0 \\
+        0 & 0 & 0
+      \end{bmatrix}
+    \end{align*}
+
+    \item[\textbf{3.3}] The dual formulation of SVM (with $C = \infty$) is:
+    \begin{align*}
+      \max_{\alpha_1, \ldots, \alpha_N} &\sum_{n=1}^N \alpha_n - \frac{1}{2} \sum_{n=1}^N \sum_{m=1}^N y_n y_m \alpha_n \alpha_m k(x_n, x_m) \\
+      \text{s.t. } &\sum_{n=1}^N y_n \alpha_n = 0 \quad \alpha_n \ge 0 ~\forall n \in [N] \\
+    \end{align*}
+    Here, we have $N = 3$, $y_1 = -1$, $y_2 = -1$, $y_3 = 1$, and $k(x_n, x_m) = K[n, m]$, where $K[n, m]$ is the $(n, m)$th entry of the Gram matrix $K$.
+    Putting in the values, we get:
+    \begin{align*}
+      &\max_{\alpha_1, \alpha_2, \alpha_3} \alpha_1 + \alpha_2 + \alpha_3 - \frac{1}{2} (2\alpha_1^2 + 2\alpha_2^2) \\
+      \text{s.t. } &-\alpha_1 - \alpha_2 + \alpha_3 = 0 \quad \alpha_1, \alpha_2, \alpha_3 \ge 0 \\
+      \equiv &\max_{\alpha_1, \alpha_2, \alpha_3} \alpha_1 + \alpha_2 + \alpha_3 - \alpha_1^2 - \alpha_2^2 \\
+      \text{s.t. } &\alpha_3 = \alpha_1 + \alpha_2 \quad \alpha_1, \alpha_2 \ge 0 \\
+      \equiv &\max_{\alpha_1, \alpha_2 \ge 0} 2\alpha_1 + 2\alpha_2 - \alpha_1^2 - \alpha_2^2
+    \end{align*}
+
+    \item[\textbf{3.4}] Let $f(\alpha_1, \alpha_2) = 2\alpha_1 + 2\alpha_2 - \alpha_1^2 - \alpha_2^2$.
+    Note that $f(\alpha_1, \alpha_2) \to -\infty$ as $\alpha_1, \alpha_2 \to \infty$, hence the point of zero gradient must be the maximum (since $f$ is quadratic in $\alpha_1, \alpha_2$).
+    \begin{align*}
+      \frac{\partial f}{\partial \alpha_1}(\alpha_1^*, \alpha_2^*) &= 2 - 2\alpha_1^* = 0 \\
+      \Rightarrow \alpha_1^* &= 1
+    \end{align*}
+    Since $f$ is symmetric in $\alpha_1$ and $\alpha_2$, we also have $\alpha_2^* = 1$.
+    And, $\alpha_3^* = \alpha_1^* + \alpha_2^* = 2$.
+
+    \item[\textbf{3.5}] Calculating the primal solution $b^*$:
+    \begin{align*}
+      b^* &= y_1 - \sum_{n=1}^3 \alpha_n^* y_n k(x_n, x_1) \\
+      &= -1 - (1 \cdot -1 \cdot 2 + -1 \cdot 1 \cdot 0 + 1 \cdot 2 \cdot 0) \\
+      &= 1
+    \end{align*}
+    Computing $k(x_n, x)$ for all $n = 1, 2, 3$ for the test point $x = 2$:
+    \begin{align*}
+      k(x_1, x) &= -1 \cdot 2 + (-1)^2 \cdot 2^2 = 2 \\
+      k(x_2, x) &= 1 \cdot 2 + 1^2 \cdot 2^2 = 6 \\
+      k(x_3, x) &= 0 \cdot 2 + 0^2 \cdot 2^2 = 0 \\
+    \end{align*}
+    Calculating the prediction $\hat{y}$:
+    \begin{align*}
+      \hat{y} &= \sgn({\mbi{w}^*}^T \mbi{\phi}(x) + b^*) \\
+      &= \sgn\left(\sum_{n=1}^3 \alpha_n^* y_n k(x_n, x) + b^*\right) \\
+      &= \sgn(1 \cdot -1 \cdot 2 + 1 \cdot -1 \cdot 6 + 2 \cdot 1 \cdot 0 + 1) \\
+      &= \sgn(-7) \\
+      &= -1
+    \end{align*}
+  \end{itemize}
+
+\end{document}

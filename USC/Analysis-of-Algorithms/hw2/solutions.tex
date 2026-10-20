@@ -1,0 +1,168 @@
+\documentclass{article}
+
+% Margins and spacing
+\usepackage[a4paper, margin=.7in]{geometry}
+% Math packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+% Placement of figures, tables, algorithms, etc.
+\usepackage{float}
+% Algorithms
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% No section numbering
+\setcounter{secnumdepth}{0}
+% No paragraph indentation
+\setlength{\parindent}{0pt}
+
+% Define custom commands
+%% Operators
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+%% Manually indented state in algorithmic environment
+\newcommand{\IndentState}{\State \hspace{2em}}
+
+\title{CSCI-570 Homework 2 Solutions}
+\author{
+  Naman Chhibbar \\
+  USC ID: 7709-8548-02
+}
+\date{}
+
+% Document body
+\begin{document}
+\maketitle
+
+\section{Problem 1}
+  Online insertion of $n$ elements into a binary heap using an unbounded array can be broken into online insertion of $n$ elements into a binary heap and into an unbounded array of starting size 1 independently.
+  \begin{itemize}
+    \item \textbf{Insertion into a binary heap:} We know from the lectures that inserting an element into a binary heap takes $O(\log n)$ time, where $n$ is the number of elements in the heap.
+    Hence, inserting $n$ elements will take:
+    \begin{align*}
+      T(n) &= \sum_{i=1}^{n} O(\log i) \\
+      &\le \sum_{i=1}^{n} O(\log n) \\
+      &= O(n \log n)
+    \end{align*}
+
+    \item \textbf{Insertion into an unbounded array:} We start with an array of size 1.
+    Addition of $n$ elements into the array (without considering the time taken to copy elements when the array is full) takes $O(n)$ time.
+    Now, for simplicity, assume that $n = 2^k$ for some $k \in \mathbb{N}$ (we can do this since we are analyzing the time complexity asymptotically).
+    We can see that we will need to resize the array $k$ times.
+    Hence, the total time taken will be:
+    \begin{align*}
+      T(n) &= O(n) + \sum_{i=0}^{k-1} 2^i \\
+      &= O(n) + (2^k - 1) \\
+      &= O(n) + (n - 1) \\
+      &= O(n)
+    \end{align*}
+  \end{itemize}
+  Therefore, the total time taken to insert $n$ elements into a binary heap using an unbounded array is $O(n \log n) + O(n) = O(n \log n)$.
+
+\section{Problem 2}
+  Denote the delete operation on the binary min-heap $H$ as $\textsc{Delete-Min}(H)$, which we know from the lectures runs in $O(\log n)$ time, where $n$ is the number of elements in the heap.
+  The required algorithm is:
+  \begin{algorithm}[H]
+    \caption{Check if two binary min-heaps have a common key}
+    \begin{algorithmic}[1]
+      \State \textbf{Input:} Two binary min-heaps $A$ and $B$ with a total of $n$ elements.
+      \State \textbf{Output:} \textbf{True} if $A$ and $B$ have a common key, \textbf{False} otherwise.
+      \State Initialize an empty array $a$ of size 2.
+      \State $a[0] \gets \textsc{Delete-Min}(A)$
+      \State $a[1] \gets \textsc{Delete-Min}(B)$
+      \While{$A$ and $B$ are not empty}
+        \If{$a[0] = a[1]$}
+          \State \Return \textbf{True}
+        \ElsIf{$a[0] < a[1]$}
+          \State $a[0] \gets \textsc{Delete-Min}(A)$
+        \Else
+          \State $a[1] \gets \textsc{Delete-Min}(B)$
+        \EndIf
+      \EndWhile
+      \State \Return \textbf{False}
+    \end{algorithmic}
+  \end{algorithm}
+
+  The algorithm starts by calling \textsc{Delete-Min} on both heaps, taking $O(\log n)$ time (since number of elements in both heaps is less than $n$).
+  Each iteration of the while loop calls \textsc{Delete-Min} at most once, again taking $O(\log n)$ time during each iteration.
+  And the while loop runs at most $(n - 2)$ times giving us the total time complexity of the algorithm as $O(n \log n) + O(\log n) = O(n \log n)$, while using an array of size 2 as our auxiliary space.
+
+\section{Problem 3}
+  Define a new operation on a binary min-heap, \textsc{Delete-Insert}, which deletes and returns the root and inserts a new element at the root.
+  The new element is then percolated down to maintain the min-heap property.
+  This operation runs in $O(\log n)$ time, where $n$ is the number of elements in the heap.
+  The required algorithm is:
+  \begin{algorithm}[H]
+    \caption{Sort a $k$-sorted array}
+    \begin{algorithmic}[1]
+      \State \textbf{Input:} A $k$-sorted array $A$ of size $n$.
+      \State \textbf{Output:} A sorted array.
+      \State Initialize a min-heap $H$ with $A[0], A[1], \dots, A[k-1]$.
+      \For{$i = 0 \to (n - k - 1)$}
+        \State $x \gets A[i + k]$
+        \State $A[i] \gets \textsc{Delete-Insert}(H, x)$
+      \EndFor
+      \For{$i = (n - k) \to (n - 1)$}
+        \State $A[i] \gets \textsc{Delete-Min}(H)$
+      \EndFor
+      \State \Return $A$
+    \end{algorithmic}
+  \end{algorithm}
+
+  Where \textsc{Delete-Min} is the standard delete operation on a binary min-heap.
+  The algorithm starts by initializing a binary min-heap with the first $k$ elements of the array in an offline manner (since we know the elements of the array), which takes $O(k)$ time (from lectures).
+  The first for loop creates a sliding window of size $k$ over the array.
+  In the $i$th iteration, we correctly place the $i$th smallest element of the array at index $i$ by calling \textsc{Delete-Insert} with the next element in the array, which takes $O(\log k)$ time.
+  This works since each element is displaced by at most $k$ indices and hence will be in the heap during its respective iteration.
+  The run time of the first for loop is therefore $O((n - k) \log k)$.
+  After there are no more elements left to add to the heap, the second for loop extracts the remaining elements from the heap using the usual \textsc{Delete-Min} operation into the array.
+  This will take $O(k \log k)$ time.
+  Thus, the total time complexity of the algorithm is $O(k) + O((n - k) \log k) + O(k \log k) = O(n \log k)$.
+
+\section{Problem 4}
+  Let $A$ be the given array of size $n$.
+  We can easily see that the largest difference between any two elements of the array is $\max(A) - \min(A)$.
+  We will use \textsc{Max-Min} (defined later) to find the maximum and minimum elements of an array in $O(n)$ time.
+  The required algorithm using this function is simply:
+  \begin{algorithm}[H]
+    \caption{Find the maximum difference between any two elements of an array}
+    \begin{algorithmic}[1]
+      \State \textbf{Input:} An array $A$ of size $n$.
+      \State \textbf{Output:} The maximum difference between any two elements of $A$.
+      \State $(max, min) \gets \textsc{Max-Min}(A, n)$
+      \State \Return $max - min$
+    \end{algorithmic}
+  \end{algorithm}
+
+  We will now define the function \textsc{Max-Min} which takes a divide-and-conquer approach to find the maximum and minimum of an array $A$ of size $n$.
+  \begin{algorithmic}[H]
+    \Function{Max-Min}{$A, n$}
+      \If{$n = 1$}
+        \State \Return $(A[0], A[0])$
+      \Else
+        \State $mid \gets \lfloor n / 2 \rfloor$
+        \State $(max_1, min_1) \gets \textsc{Max-Min}(A[0:mid-1], mid)$
+        \State $(max_2, min_2) \gets \textsc{Max-Min}(A[mid:n-1], n - mid)$
+        \State $max \gets \max(max_1, max_2)$
+        \State $min \gets \min(min_1, min_2)$
+        \State \Return $(max, min)$
+      \EndIf
+    \EndFunction
+  \end{algorithmic}
+  where $A[i:j]$ denotes the subarray of $A$ from index $i$ to $j$ (both inclusive).
+  We can easily see that the base case takes $O(1)$ time and each recursive call takes $T(\lfloor n/2 \rfloor) + T(\lceil n/2 \rceil) + O(1) \approx 2 T(n/2) + O(1)$ time (for large $n$).
+  To see that the time complexity of the function is $O(n)$ and for simplicity, we can use the substitution $n = 2^k$ and writing $U(k) = T(2^k) = T(n)$ (we can do this because we are analyzing $T$ asymptotically).
+  Hence, the recurrence becomes:
+  \begin{align*}
+    T(2^k) &= 2 T(2^{k-1}) + O(1) \\
+    \Rightarrow U(k) &= 2 U(k - 1) + O(1) \\
+    &= 2(2 U(k - 2) + O(1)) + O(1) \\
+    &= 2^2 U(k - 2) + O(1) + O(1) \\
+    &\dots \\
+    &= 2^k U(0) + \underbrace{O(1) + \dots + O(1)}_{k \text{ times}} \\
+    &= 2^k O(1) + O(k) \\
+    &= O(2^k) = O(n) \\
+    \Rightarrow T(n) &\in O(n)
+  \end{align*}
+
+\end{document}

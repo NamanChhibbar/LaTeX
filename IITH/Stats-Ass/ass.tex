@@ -1,0 +1,121 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper, margin=.7in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\title{Stats Assignment}
+\author{
+	Naman Chhibbar \\
+	MA21BTECH11011
+}
+\date{}
+
+\pagenumbering{gobble}
+\setcounter{secnumdepth}{0}
+
+\newcommand{\mean}[1]{\boldsymbol{\overline{#1}}}
+\newcommand{\mom}[1]{\hat{#1}_{\text{MOM}}}
+\newcommand{\mle}[1]{\hat{#1}_{\text{MLE}}}
+
+\begin{document}
+	\maketitle
+
+  \begin{enumerate}
+
+    \item[\textbf{Q1}]
+    \begin{enumerate}
+      \item[(i)] We know that for $X \sim Geom(\theta)$, we have $\mathbb{E}[X] = 1/\theta$.
+      Hence, the MME of $g(\theta) = \theta$ is:
+      \[\overline{X} = 1 / \mom{\theta} \Rightarrow \mom{\theta} = 1 / \mean{X}\]
+      \[\therefore \mom{g} = 1 / \mean{X}\]
+      MLE of $g$ is:
+      \begin{align*}
+        l(\theta | \boldsymbol{X}) &= \sum_{i = 1}^{n} \ln f(X_i | \theta) \\
+        &= \sum_{i = 1}^{n} \ln \theta + (X_i - 1) \ln(1 - \theta) \\
+      \end{align*}
+      Maximizing likelihood:
+      \begin{align*}
+        \frac{d}{d\theta} l(\theta | \boldsymbol{X}) &= 0 \\
+        \Rightarrow \sum_{i = 1}^{n} 1/\theta - (X_i - 1) / (1 - \theta) &= 0 \\
+        \Rightarrow \frac{\sum_{i = 1}^{n} X_i - n}{1 - \theta} &= \frac n \theta \\
+        \Rightarrow \mle{\theta} &= \frac{n}{\sum_{i = 1}^{n} X_i} = 1 / \mean{X} \\
+      \end{align*}
+      Hence, MME and MLE of $g(\theta)$ are the same. \\
+      From the data $x_1 = 2, x_2 = 7, x_3 = 6, x_4 = 5 \text{ and } x_5 = 9$, we have $\mle{\theta} = 5 / 29$
+      \begin{align*}
+        \mathbb{P}(X \ge 4 | \mle{\theta}) &= 1 - \mathbb{P}(X < 4 | \mle{\theta}) \\
+        &= 1 - \sum_{i = 1}^{3} \mathbb{P}(X = i | \mle{\theta}) \\
+        &= 1 - \sum_{i = 1}^{3} \mle{\theta} (1 - \mle{\theta})^{i - 1} \\
+        &= 1 - \mle{\theta} \frac{1 - (1 - \mle{\theta})^3}{1 - (1 - \mle{\theta})} \\
+        &= (1 - \mle{\theta})^3 \\
+        &= (24 / 29)^3 \\
+      \end{align*}
+
+      \item[(ii)] Since $\mathbb{E}[X] = 0$ for $X \sim \text{Uniform}(-\theta, \theta)$, we have $\mom{g} = 0$.
+      MLE of $g(\theta)$:
+      \begin{align*}
+        L(\theta|\boldsymbol{X}) &= \prod_{i = 1}^{n} f(X_i | \theta) \\
+        &= \prod_{i = 1}^{n} 1 / 2\theta = 1 / (2\theta)^n
+      \end{align*}
+      We can easily see that likelihood is maximized if $\theta$ is minimized.
+      We should also note that:
+      \[-\theta \le X_i \le \theta \quad \forall i \in \{1, 2, \dots, n\}\]
+      \[\Rightarrow \theta \ge -X_i \text{ and } \theta \ge X_i \quad \forall i \in \{1, 2, \dots, n\}\]
+      \[\Rightarrow \theta \ge |X_i| \quad \forall i \in \{1, 2, \dots, n\}\]
+      \[\Rightarrow \theta \ge |X_{(n)}|\]
+      \[\Rightarrow \mle{\theta} = |X_{(n)}|\]
+      Hence, MME and MLE of $g(\theta)$ are not the same.
+
+      \item[(iii)] Given $X_i \sim \text{Exp}(\mu, \sigma) ~ \forall i \in \{1, 2, \dots, n\}$ with the PDF:
+      \[f(x|\boldsymbol{\theta}) = \begin{cases}
+        \frac 1 \sigma \exp\left(-\frac{x - \mu}{\sigma}\right) & x > \mu \\
+        0 & \text{o/w}
+      \end{cases}\]
+      \[\Rightarrow \mathbb{E}[X_i] = \int_{\mu}^{\infty} \frac x \sigma \exp\left(-\frac{x - \mu}{\sigma}\right) ~ dx \]
+      Using $u = \frac{x - \mu}{\sigma}$:
+      \begin{align*}
+        \Rightarrow \mathbb{E}[X_i] &= \int_{0}^{\infty} \frac{\sigma u + \mu}{\sigma} e^{-u} ~ \sigma du \\
+        &= \sigma \int_{0}^{\infty} u \, e^{-u} ~ du + \mu \int_{0}^{\infty} e^{-u} ~ du \\
+        &= \sigma + \mu
+      \end{align*}
+      Calculating $\mathbb{E}[X_i^2]$:
+      \[\mathbb{E}[X_i^2] = \int_{\mu}^{\infty} \frac{x^2}{\sigma} \exp\left(-\frac{x - \mu}{\sigma}\right) ~ dx\]
+      Using $u = \frac{x - \mu}{\sigma}$:
+      \begin{align*}
+        \Rightarrow \mathbb{E}[X_i^2] &= \int_{0}^{\infty} \frac{(\sigma u + \mu)^2}{\sigma} e^{-u} ~ \sigma du \\
+        &= \int_{0}^{\infty} (\sigma^2 u^2 + 2 \sigma \mu u + \mu^2) e^{-u} ~ du \\
+        &= \sigma^2 \int_{0}^{\infty} u^2 e^{-u} ~ du + 2 \mu \sigma \int_{0}^{\infty} u \, e^{-u} ~ du + \mu^2 \int_{0}^{\infty} e^{-u} ~ du \\
+        &= 2 \sigma^2 + 2 \mu \sigma + \mu^2 \\
+        &= (\mu + \sigma)^2 + \sigma^2
+      \end{align*}
+      Comparing moments to find MME:
+      \begin{align*}
+        \mathbb{E}[X_i] &= \mean{X} \\
+        \Rightarrow \mu + \sigma &= \mean{X}
+      \end{align*}
+      \begin{align*}
+        \mathbb{E}[X_i^2] &= \frac{\sum_{i = 1}^{n} X_i^2}{n} \\
+        \Rightarrow (\mu + \sigma)^2 + \sigma^2 &= \frac{\sum_{i = 1}^{n} X_i^2}{n} \\
+        \Rightarrow \mean{X}^2 + \sigma^2 &= \frac{\sum_{i = 1}^{n} X_i^2}{n} \\
+        \Rightarrow \mom{\sigma} &= \sqrt{\frac{\sum_{i = 1}^{n} X_i^2}{n} - \mean{X}^2} \\
+        \Rightarrow \mom{\mu} &= \mean{X} - \mom{\sigma}
+      \end{align*}
+      Finding MLE:
+      \begin{align*}
+        l(\boldsymbol{\theta} | \boldsymbol{X}) &= \sum_{i = 1}^{n} \ln f(X_i | \boldsymbol{\theta}) \\
+        &= \sum_{i = 1}^{n} -\frac{X_i - \mu}{\sigma} - \ln \sigma \\
+      \end{align*}
+      We can easily see that increasing $\mu$ increases the likelihood.
+      Also:
+      \[X_i > \mu \quad \forall i \in \{1, 2, \dots, n\}\]
+      Maximmizing MLE:
+      \begin{align*}
+        \frac{\partial}{\partial \mu} l(\boldsymbol{\theta} | \boldsymbol{X}) &= 0 \\
+        \Rightarrow \sum_{i = 1}^{n} \frac{X_i - \mle{\mu}}{\mle{\sigma}^2} &= 0 \\
+        \Rightarrow \mle{\mu} &= \frac{\sum_{i = 1}^{n} X_i}{n} = \mean{X}
+      \end{align*}
+    \end{enumerate}
+
+  \end{enumerate}
+
+\end{document}

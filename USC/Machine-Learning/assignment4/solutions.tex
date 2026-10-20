@@ -1,0 +1,247 @@
+\documentclass{article}
+\usepackage[a4paper, margin=.7in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{nameref}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{makecell}
+
+% No section numbering
+\setcounter{secnumdepth}{0}
+% No paragraph indentation
+\setlength{\parindent}{0pt}
+
+% Define custom commands
+%% Bold-italic math symbols
+\newcommand{\mbi}[1]{\boldsymbol{#1}}
+%% Manually indented states in algorithmic environment
+\newcommand{\IndentState}{\State \hspace{1em}}
+\newcommand{\DIndentState}{\State \hspace{2em}}
+%% Argmin operator
+\DeclareMathOperator*{\argmin}{arg\,min}
+%% Argmax operator
+\DeclareMathOperator*{\argmax}{arg\,max}
+%% Softmax operator
+\DeclareMathOperator{\softmax}{\mathbf{softmax}}
+%% UCB operator
+\DeclareMathOperator{\UCB}{UCB}
+
+\title{CSCI-567 Assignment 4 Solutions}
+\author{
+  Naman Chhibbar \\
+  USC ID: 7709-8548-02
+}
+\date{}
+
+% Document body
+\begin{document}
+\maketitle
+
+\section{Problem 1}
+  \begin{itemize}
+    \item[\textbf{1.1}]
+    \begin{align*}
+      &P(Z_t = s | X_{1:t-1} = x_{1:t-1}, X_{t+1:T} = x_{t+1:T}) \\
+      &= \frac{P(Z_t = s, X_{1:t-1} = x_{1:t-1}, X_{t+1:T} = x_{t+1:T})}{P(X_{1:t-1} = x_{1:t-1}, X_{t+1:T} = x_{t+1:T})} \\
+      &\propto P(Z_t = s, X_{1:t-1} = x_{1:t-1}, X_{t+1:T} = x_{t+1:T})
+    \end{align*}
+    Since $P(X_{1:t-1} = x_{1:t-1}, X_{t+1:T} = x_{t+1:T})$ is a constant with respect to $s$.
+    Now:
+    \begin{align*}
+      &P(Z_t = s | X_{1:t-1} = x_{1:t-1}, X_{t+1:T} = x_{t+1:T}) \\
+      &\propto P(Z_t = s, X_{1:t-1} = x_{1:t-1}, X_{t+1:T} = x_{t+1:T}) \\
+      &\propto P(X_{t+1:T} = x_{t+1:T} | Z_t = s, X_{1:t-1} = x_{1:t-1}) P(Z_t = s, X_{1:t-1} = x_{1:t-1}) \\
+      &\propto P(X_{t+1:T} = x_{t+1:T} | Z_t = s) P(Z_t = s, X_{1:t-1} = x_{1:t-1}) \quad \text{($X_{t+1:T}$ depends only on $Z_t$)} \\
+      &\propto \alpha_s(t-1) \beta_s(t) \\
+      &= k \cdot \alpha_s(t-1) \beta_s(t)
+    \end{align*}
+    where $k$ is a normalizing constant such that $\sum_{s=1}^{S} P(Z_t = s | X_{1:t-1} = x_{1:t-1}, X_{t+1:T} = x_{t+1:T}) = 1$.
+    \begin{align*}
+      &\sum_{s=1}^{S} P(Z_t = s | X_{1:t-1} = x_{1:t-1}, X_{t+1:T} = x_{t+1:T}) = 1 \\
+      &\Rightarrow k \cdot \sum_{s=1}^{S} \alpha_s(t-1) \beta_s(t) = 1 \\
+      &\Rightarrow k = \frac{1}{\sum_{s=1}^{S} \alpha_s(t-1) \beta_s(t)}
+    \end{align*}
+    Therefore, we have:
+    \[ P(Z_t = s | X_{1:t-1} = x_{1:t-1}, X_{t+1:T} = x_{t+1:T}) = \frac{\alpha_s(t-1) \beta_s(t)}{\sum_{s'=1}^{S} \alpha_{s'}(t-1) \beta_{s'}(t)} \]
+
+    \item[\textbf{1.2}] Marginalizing the required probability with respect to $Z_t$:
+    \begin{align*}
+      &P(X_t = o | X_{1:t-1} = x_{1:t-1}, X_{t+1:T} = x_{t+1:T}) \\
+      &= \sum_{s=1}^{S} P(X_t = o, Z_t = s | X_{1:t-1} = x_{1:t-1}, X_{t+1:T} = x_{t+1:T}) \\
+      &= \sum_{s=1}^{S} P(X_t = o | Z_t = s, X_{1:t-1} = x_{1:t-1}, X_{t+1:T} = x_{t+1:T}) P(Z_t = s | X_{1:t-1} = x_{1:t-1}, X_{t+1:T} = x_{t+1:T}) \\
+      &= \sum_{s=1}^{S} P(X_t = o | Z_t = s) P(Z_t = s | X_{1:t-1} = x_{1:t-1}, X_{t+1:T} = x_{t+1:T}) \quad \text{($X_t$ depends only on $Z_t$)} \\
+      &= \sum_{s=1}^{S} b_{s,o} \cdot \frac{\alpha_s(t-1) \beta_s(t)}{\sum_{s'=1}^{S} \alpha_{s'}(t-1) \beta_{s'}(t)} \\
+      &= \frac{\sum_{s=1}^{S} b_{s,o} \alpha_s(t-1) \beta_s(t)}{\sum_{s'=1}^{S} \alpha_{s'}(t-1) \beta_{s'}(t)}
+    \end{align*}
+  \end{itemize}
+
+\section{Problem 2}
+  \begin{itemize}
+    \item[\textbf{2.1}]
+    \begin{itemize}
+      \item[1)] We have the input embedding size $d = 32$, key and query vectors size $d_k = 16$, and value vector size $d_v = 8$.
+      We know that an attention head has three weight matrices (ignoring biases): $W_Q \in \mathbb{R}^{d \times d_k}$, $W_K \in \mathbb{R}^{d \times d_k}$, and $W_V \in \mathbb{R}^{d \times d_v}$.
+      Hence, the total number of parameters in this head is:
+      \begin{align*}
+        (d \times d_k) + (d \times d_k) + (d \times d_v) &= 32 \times 16 + 32 \times 16 + 32 \times 8 \\
+        &= 512 + 512 + 256 \\
+        &= 1,280
+      \end{align*}
+
+      \item[2)] We know that the attention score matrix is of size $T \times T$ and the output matrix is of size $T \times d_v$, where $T$ is the input sequence length.
+      Here, we have $T = 10$ tokens, making attention score matrix of size $10 \times 10$ and output matrix of size $10 \times 8$.
+    \end{itemize}
+
+    \item[\textbf{2.2}]
+    \begin{itemize}
+      \item[1)] Since we have 8 attention heads, the final output dimension will be $T \times 64$ after concatenation for an input sequence of length $T$.
+      In order to convert this to the original embedding size of 32, we need a weight matrix of size $64 \times 32$.
+      Ignoring the bias term again, the total number of parameters in this multi-head attention layer is:
+      \begin{align*}
+        8 \times \underbrace{1,280}_{\text{\#params per head}} + \underbrace{64 \times 32}_{\text{projection matrix}} &= 10,240 + 2,048 \\
+        &= 12,288
+      \end{align*}
+
+      \item[2)] The attention score matrices of a head in the self-attention and encoder-decoder attention layers are of sizes $T_{dec} \times T_{dec}$ and $T_{dec} \times T_{enc}$ respectively, where $T_{dec}$ and $T_{enc}$ are the input sequence lengths to the decoder and encoder respectively.
+      We have $T_{dec} = 20$ and $T_{enc} = 10$ here, making the sizes $20 \times 20$ and $20 \times 10$ respectively.
+
+      \item[3)] Suppose we have the \textbf{softmax} function that takes in a vector and outputs a vector of the same dimension with:
+      \[
+        \softmax(\mbi{x})^i = \frac{\exp(\mbi{x}^i)}{\sum_{j=1}^D \exp(\mbi{x}^j)}
+        \quad \forall i \in \{1, \ldots, D\}, \mbi{x} \in \mathbb{R}^D, D \in \mathbb{N}
+      \]
+      where $\mbi{x}^i$ is the $i^{th}$ element of the vector $\mbi{x}$.
+      Then, the cross-entropy loss for this training example will be:
+      \[ \mathcal{L} = -\sum_{i=1}^{20} \softmax(\mbi{z}_i)^T \mbi{y}_i \]
+      Since $\mbi{y}_i$ is a one-hot vector, we pick the $j^{th}$ element of $\softmax(\mbi{z}_i)$ where $j$ is the index of 1 in $\mbi{y}_i$.
+    \end{itemize}
+  \end{itemize}
+
+\section{Problem 3}
+  Here is the required table:
+  \begin{table}[h!]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|}
+      \hline
+      & \multicolumn{2}{c|}{upper confidence bound} & & \\
+      \cline{2-3}
+      & $\UCB_{t,a}$ for $a = A$ & $\UCB_{t,a}$ for $a = B$ & selected arm $a_t$ & reward \\
+      \hline
+      $t=1$ & $\infty$ & $\infty$ & $A$ & 1 \\
+      \hline
+      $t=2$ & $1+2\sqrt{\ln2}$ & $\infty$ & $B$ & 0 \\
+      \hline
+      $t=3$ & $1+2\sqrt{\ln3}$ & $2\sqrt{\ln3}$ & $A$ & 0 \\
+      \hline
+      $t=4$ & $1/2+2\sqrt{\ln2} \approx 2.17$ & $2\sqrt{2\ln2} \approx 2.35$ & $B$ & 0 \\
+      \hline
+      $t=5$ & $1/2+2\sqrt{\frac{\ln5}{2}}$ & $2\sqrt{\frac{\ln5}{2}}$ & $A$ & 1 \\
+      \hline
+    \end{tabular}
+  \end{table}
+
+\section{Problem 4}
+  \begin{itemize}
+    \item[\textbf{4.1}] We have $V_1(s) = 0 ~ \forall s \in \{1, 2, 3, 4\}$ with the discount factor $\gamma = 0.9$.
+    And since the reward function does not depend on the action taken, we have $r(s, a) = r(s) ~ \forall s \in \{1, 2, 3, 4\}$. \\
+    First iteration: \\
+    \begin{align*}
+      V_2(s) &= r(s) + \max_{a \in \{\text{left}, \text{right}\}} \gamma \sum_{s'} P(s' | s, a) V_1(s') \\
+      &= r(s) \quad \forall s \in \{1, 2, 3, 4\} ~ \text{(since $V_1(s') = 0 ~ \forall s'$)} \\
+    \end{align*}
+    All of the values are listed in the table below. \\
+    Second iteration for $s = 1$: \\
+    \begin{align*}
+      V_3(1) &= r(1) + \max_{a \in \{\text{left}, \text{right}\}} \gamma \sum_{s'} P(s' | 1, a) V_2(s') \\
+      &= 0.1 + \max_{a \in \{\text{left}, \text{right}\}} \gamma (P(1|s=1, a)r(1) + P(2|s=1, a)r(2)) \\
+      &= 0.1 + \max_{a \in \{\text{left}, \text{right}\}} 0.9 \cdot 0.1 \cdot P(1|s=1, a) \\
+    \end{align*}
+    Clearly $P(1|s=1, a)$ is maximum (= 1) when $a = \text{left}$, giving us $V_3(1) = 0.19$. \\
+    Second iteration for $s = 2$: \\
+    \begin{align*}
+      V_3(2) &= r(2) + \max_{a \in \{\text{left}, \text{right}\}} \gamma \sum_{s'} P(s' | 2, a) V_2(s') \\
+      &= 0 + \max_{a \in \{\text{left}, \text{right}\}} \gamma (P(1|s=2, a)r(1) + P(2|s=2, a)r(2) + P(3|s=2, a)r(3)) \\
+      &= 0.9 \cdot \max_{a \in \{\text{left}, \text{right}\}} P(1|s=2, a)r(1) \\
+    \end{align*}
+    Again, $P(1|s=2, a)$ is maximum (= 1) when $a = \text{left}$, giving us $V_3(2) = 0.9 \cdot 0.1 = 0.09$. \\
+    Second iteration for $s = 3$: \\
+    \begin{align*}
+      V_3(3) &= r(3) + \max_{a \in \{\text{left}, \text{right}\}} \gamma \sum_{s'} P(s' | 3, a) V_2(s') \\
+      &= 0 + \max_{a \in \{\text{left}, \text{right}\}} \gamma (P(2|s=3, a)r(2) + P(3|s=3, a)r(3) + P(4|s=3, a)r(4)) \\
+      &= 0.9 \cdot \max_{a \in \{\text{left}, \text{right}\}} P(4|s=3, a)r(4) \\
+    \end{align*}
+    Now, $P(4|s=3, a)$ is non-zero only when $a = \text{right}$, giving us $V_3(3) = 0.9 \cdot 1 = 0.9$. \\
+    Second iteration for $s = 4$: \\
+    \begin{align*}
+      V_3(4) &= r(4) + \max_{a \in \{\text{left}, \text{right}\}} \gamma \sum_{s'} P(s' | 4, a) V_2(s') \\
+      &= 1 + \max_{a \in \{\text{left}, \text{right}\}} \gamma (P(3|s=4, a)r(3) + P(4|s=4, a)r(4)) \\
+      &= 1 + 0.9 \cdot \max_{a \in \{\text{left}, \text{right}\}} P(4|s=4, a)r(4)
+    \end{align*}
+    $P(4|s=4, a) = 1$ only when $a = \text{right}$, giving us $V_3(4) = 1 + 0.9 \cdot 1 = 1.9$. \\
+    The final values are listed in the table below:
+    \begin{table}[h!]
+      \centering
+      \begin{tabular}{|c|c|c|c|c|}
+        \hline
+        & $s=1$ & $s=2$ & $s=3$ & $s=4$ \\
+        \hline
+        $V_1(s)$ & 0 & 0 & 0 & 0 \\
+        \hline
+        $V_2(s)$ & 0.1 & 0 & 0 & 1 \\
+        \hline
+        $V_3(s)$ & 0.19 & 0.09 & 0.9 & 1.9 \\
+        \hline
+      \end{tabular}
+    \end{table}
+
+    \item[\textbf{4.2}]
+    \begin{itemize}
+      \item[1)] Let $s \in \mathcal{S}$ be any state.
+      Now, we have:
+      \begin{align*}
+        |V_{k+1}(s) - V(s)| &= \left|\max_{a \in \mathcal{A}} \left(r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' | s, a) V_k(s')\right) - \max_{a \in \mathcal{A}} \left(r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' | s, a) V(s')\right)\right| \\
+        &\le \max_{a \in \mathcal{A}} \left| \left(r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' | s, a) V_k(s')\right) - \left(r(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s' | s, a) V(s')\right) \right| \quad \text{(using the hint)} \\
+        &\le \max_{a \in \mathcal{A}} \left| \gamma \sum_{s' \in \mathcal{S}} P(s' | s, a) (V_k(s') - V(s')) \right| \\
+        &\le \max_{a \in \mathcal{A}} \gamma \sum_{s' \in \mathcal{S}} P(s' | s, a) |V_k(s') - V(s')| \quad \text{(traingle inequality)} \\
+        &\le \max_{a \in \mathcal{A}} \gamma \sum_{s' \in \mathcal{S}} P(s' | s, a) \cdot \max_{s' \in \mathcal{S}} |V_k(s') - V(s')| \\
+        &\le \max_{a \in \mathcal{A}} \gamma \cdot \max_{s' \in \mathcal{S}} |V_k(s') - V(s')| \sum_{s' \in \mathcal{S}} P(s' | s, a) \quad \text{($\max_{s' \in \mathcal{S}} |V_k(s') - V(s')|$ is a constant)} \\
+        &\le \max_{a \in \mathcal{A}} \gamma \cdot \max_{s' \in \mathcal{S}} |V_k(s') - V(s')| \cdot 1 \\
+        \Rightarrow |V_{k+1}(s) - V(s)| &\le \gamma \cdot \max_{s' \in \mathcal{S}} |V_k(s') - V(s')| \tag{1}
+      \end{align*}
+      Since $s$ is arbitrary, (1) holds for all $s \in \mathcal{S}$.
+      Therefore, we have proved:
+      \[ \max_{s \in \mathcal{S}} |V_{k+1}(s) - V(s)| \le \gamma \cdot \max_{s \in \mathcal{S}} |V_k(s) - V(s)| \]
+
+      \item[2)] From part 1), we have:
+      \begin{align*}
+        \max_{s \in \mathcal{S}} |V_{k+1}(s) - V(s)| &\le \gamma \cdot \max_{s \in \mathcal{S}} |V_k(s) - V(s)| \\
+        &\le \gamma^2 \cdot \max_{s \in \mathcal{S}} |V_{k-1}(s) - V(s)| \\
+        \vdots \\
+        &\le \gamma^{k} \cdot \max_{s \in \mathcal{S}} |V_1(s) - V(s)| \\
+        &\le \gamma^{k} \cdot \max_{s \in \mathcal{S}} |V(s)| \tag{1}
+      \end{align*}
+      Now:
+      \begin{align*}
+        |V(s)| &= \left| \max_\pi \mathbb{E}\left[ \sum_{t=1}^{\infty} \gamma^{t-1} r(s_t, a_t) \mid s_1 = s \right] \right| \\
+        &\le \max_\pi \mathbb{E}\left[ \sum_{t=1}^{\infty} \gamma^{t-1} |r(s_t, a_t)| \mid s_1 = s \right] \quad \text{(traingle inequality)} \\
+        &\le \sum_{t=1}^{\infty} \gamma^{t-1} \quad \text{(using $|r(s, a)| \le 1$)} \\
+        \Rightarrow |V(s)| &\le \frac{1}{1 - \gamma}
+      \end{align*}
+      Using this in (1), we get:
+      \[ \max_{s \in \mathcal{S}} |V_{k+1}(s) - V(s)| \le \frac{\gamma^{k}}{1 - \gamma} \]
+
+      \item[3)] We basically need to find the smallest $T \in \mathbb{N}$ such that:
+      \begin{align*}
+        \max_{s \in \mathcal{S}} |V_{T+1}(s) - &V(s)| \le \frac{\gamma^T}{1 - \gamma} \le 0.01 \\
+        \Rightarrow \gamma^T &\le 0.01 (1 - \gamma) \\
+        \Rightarrow 0.1^T &\le 0.01 \cdot 0.1 = 0.001 \\
+        \Rightarrow T &\ge \log_{10^{-1}} 10^{-3} \quad \text{(inequality reverses since $0.1 < 1$)} \\
+        \Rightarrow T &\ge 3
+      \end{align*}
+      Hence, the minimum number of iterations we need is just 3.
+    \end{itemize}
+  \end{itemize}
+
+\end{document}

@@ -1,0 +1,251 @@
+\documentclass{article}
+\usepackage[a4paper, margin=.7in]{geometry}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{nameref}
+
+% No section numbering
+\setcounter{secnumdepth}{0}
+% No page numbering
+\pagenumbering{gobble}
+% No paragraph indentation
+\setlength{\parindent}{0pt}
+
+\title{CSCI-570 Homework 1 Solutions}
+\author{
+  Naman Chhibbar \\
+  USC ID: 7709-8548-02
+}
+\date{September 7, 2025}
+
+% Document body
+\begin{document}
+\maketitle
+
+\section{Problem 1}
+
+  The modified algorithm is as follows:
+
+  \begin{itemize}
+    \item While there is a man $m$ who is free:
+    \begin{itemize}
+      \item Let $w_0, w_1, \dots, w_{k-1}$ be the highest ranked women tied with each other to whom $m$ has not yet proposed.
+      \item If $k = 1$ (no ties):
+      \begin{itemize}
+        \item If $w_0$ is free, then pair $m$ and $w_0$.
+        \item Else let $m_0$ be the man paired with $w_0$.
+        \item If $w_0$ prefers $m$ to $m_0$, then pair $m$ and $w_0$ and make $m_0$ free.
+      \end{itemize}
+      \item Else if any of $w_0, w_1, \dots, w_{k-1}$ is free, then pair $m$ with any one of them.
+      \item Else (all of $w_0, w_1, \dots, w_{k-1}$ are paired):
+      \begin{itemize}
+        \item Let $m_i$ be paired with $w_i$ for $i \in \{0, 1, \dots, k-1\}$.
+        \item If $\exists i \in \{0, 1, \dots, k-1\}$ such that $w_i$ prefers $m$ to $m_i$ or $m_i$ is tied with $m$, then pair $m$ and $w_i$ and make $m_i$ free.
+        \item Else $m$ remains free and does not propose to any of $w_0, w_1, \dots, w_{k-1}$ again.
+      \end{itemize}
+    \end{itemize}
+  \end{itemize}
+
+\section{Problem 2}
+
+  To prove: $3 | n^3 + 2n ~ \forall n \in \mathbb{N}$
+
+  Base case $n = 1$: $1^3 + 2(1) = 3$ which is divisible by 3.
+
+  Inductive step: \\
+  Suppose the statement holds for $n \in \mathbb{N}$.
+  Hence $\exists k \in \mathbb{N}$ such that $n^3 + 2n = 3k$.
+  Now:
+  \begin{align*}
+    (n + 1)^3 + 2(n + 1) &= n^3 + 3n^2 + 3n + 1 + 2n + 2 \\
+    &= n^3 + 2n + 3n^2 + 3n + 3 \\
+    &= 3k + 3(n^2 + n + 1) \\
+    \Rightarrow 3 &| (n + 1)^3 + 2(n + 1)
+  \end{align*}
+  Hence, the statement holds for $n + 1$ whenever it holds for $n$.
+  Thus, by induction, $3 | n^3 + 2n ~ \forall n \in \mathbb{N}$.
+
+\section{Problem 3}
+
+  To prove: $\sum_{i=0}^{n} 2^i = 2^{n+1} - 1 ~ \forall n \in \mathbb{N}$.
+
+  Base case $n = 1$: $\sum_{i=0}^{1} 2^i = 1 + 2 = 3 = 2^2 - 1$
+
+  Inductive step: \\
+  Suppose $\sum_{i=0}^{n} 2^i = 2^{n+1} - 1$ holds for $n \in \mathbb{N}$.
+  Now:
+  \begin{align*}
+    \sum_{i=1}^{n+1} 2^i &= \sum_{i=1}^{n} 2^i + 2^{n+1} \\
+    &= 2^{n+1} - 1 + 2^{n+1} \\
+    &= 2 \cdot 2^{n+1} - 1 \\
+    &= 2^{n+2} - 1
+  \end{align*}
+  Hence, the statement holds for $n + 1$ whenever it holds for $n$.
+  Thus, by induction, $\sum_{i=1}^{n} 2^i = 2^{n+1} - 1 ~ \forall n \in \mathbb{N}$.
+
+\section{Problem 4}
+
+  To prove: If $x_1 + x_2 = x_3 + x_4 = 1$ and $x_1x_3 + x_2x_4 > 1$, $x_1, x_2, x_3, x_4 \in \mathbb{R}$ then at least one of $x_1, x_2, x_3, x_4$ is negative.
+
+  Proof by contradiction: \\
+  Assume all $x_1, x_2, x_3, x_4 \geq 0$.
+  Since we know $x_1 + x_2 = x_3 + x_4 = 1$, we have:
+  \[ (x_1 + x_2)(x_3 + x_4) = 1 \]
+  But:
+  \[ (x_1 + x_2)(x_3 + x_4) = x_1x_3 + x_2x_4 + x_1x_4 + x_2x_3 \]
+  Since $x_1, x_2, x_3, x_4 \geq 0$, we get $x_1x_4 + x_2x_3 \geq 0$.
+  Also, it is given that $x_1x_3 + x_2x_4 > 1$.
+  Hence, we get:
+  \[ (x_1 + x_2)(x_3 + x_4) = x_1x_3 + x_2x_4 + x_1x_4 + x_2x_3 > 1 \]
+  Which is a contradiction.
+  Hence, one of $x_1, x_2, x_3, x_4$ must be negative.
+
+\section{Problem 5}
+
+  The correct order is:
+  \[ f_h < f_b < f_g < f_i \sim f_j < f_d < f_e < f_f < f_a < f_c \]
+  where $f < g$ means $f \in o(g)$ ($f$ is strictly asymptotically smaller than $g$) and $f \sim g$ means $f \in \Theta(g)$ ($f$ is asymptotically equal to $g$).
+
+  We will use the definition of little-o notation in our proof: \\
+  We say a function $f(n) \in o(g(n))$ if:
+  \[ \lim_{n \to \infty} \frac{f(n)}{g(n)} = 0 \]
+
+  Before moving to the proof, we will simplify some of the functions:
+  \begin{align*}
+    &f_b(n) = \sqrt{\log n^{20}} = \sqrt{20 \log e} \cdot \sqrt{\ln n} = c_b \sqrt{\ln n} \qquad \left( \frac{\log n}{\log e} = \ln n \right) \\
+    &f_d(n) = n \cdot \frac{\ln n}{\ln 2} = c_d \cdot n \ln n \\
+    &f_e(n) = n(\log n)^{20} = (\log e)^{20} \cdot n (\ln n)^{20} = c_e \cdot n (\ln n)^{20} \\
+    &f_f(n) = n^{\log n} = n^{\log e \cdot \ln n} = n^{c_f \ln n} \\
+    &f_g(n) = \log \sqrt{n^{20}} = 10/\log e \cdot \ln n = c_g \ln n \\
+    &f_h(n) = \lfloor \pi e \rfloor! = c_h \\
+    &f_i(n) = \prod_{i=1}^{n} \frac{i + 1}{i} = \frac{(n + 1)!}{n!} = n + 1 \\
+    &f_j(n) = \frac{n}{f_h(n)} = n / c_h = c_j \cdot n
+  \end{align*}
+  where $c_b, c_d, c_e, c_f, c_g, c_h, c_i, c_j > 0$ are constants of their respective functions.
+
+  Proof of the ordering:
+  \begin{itemize}
+    \item[$f_h < f_b$] We can trivially see this since $f_h(n)$ is a constant and $f_b(n)$ grows with $n$.
+    
+    \item[$f_b < f_g$] This is true since $f_b(n) \in \Theta(\sqrt{\ln n})$, $f_g(n) \in \Theta(\ln n)$, and $\sqrt{\ln n} \in o(\ln n)$ trivially.
+    
+    \item[$f_g < f_i$] This is true since $f_g(n) \in \Theta(\ln n)$, $f_i(n) \in \Theta(n)$, and $\ln n \in o(n)$ is a known result.
+
+    \item[$f_i \sim f_j$] This is true since both $f_i(n), f_j(n) \in \Theta(n)$.
+    
+    \item[$f_j < f_d$] This is true since $f_j(n) \in \Theta(n)$, $f_d(n) \in \Theta(n \ln n)$, and $n \in o(n \ln n)$.
+    
+    \item[$f_d < f_e$] $\lim_{n \to \infty} \frac{f_d(n)}{f_e(n)} = \lim_{n \to \infty} \frac{c_d n \ln n}{c_e n (\ln n)^{20}} = \lim_{n \to \infty} \frac{c_d}{c_e} \cdot \frac{1}{(\ln n)^{19}} = 0$
+    
+    \item[$f_e < f_f$] Let $L = \lim_{n \to \infty} \frac{f_e(n)}{f_f(n)}$.
+    \begin{align*}
+      \ln L &= \lim_{n \to \infty} \ln f_e(n) - \ln f_f(n) \\
+      &= \lim_{n \to \infty} \ln c_e + \ln n + 20 \ln\ln n - c_f \ln n \cdot \ln n \\
+      &= \lim_{n \to \infty} - c_f (\ln n)^2 + \ln n + 20 \ln\ln n + \ln c_e \\
+      &= -\infty \\
+      \Rightarrow L &= 0
+    \end{align*}
+
+    \item[$f_f < f_a$] Let $L = \lim_{n \to \infty} \frac{f_f(n)}{f_a(n)}$.
+    \begin{align*}
+      \ln L &= \lim_{n \to \infty} \ln f_f(n) - \ln f_a(n) \\
+      &= \lim_{n \to \infty} c_f (\ln n)^2 - \ln n!
+    \end{align*}
+    Using Stirling's approximation $\ln n! \sim n \ln n - n$ (we can do this since we are analyzing asymptotic behavior), we get:
+    \begin{align*}
+      \ln L &= \lim_{n \to \infty} c_f (\ln n)^2 - (n \ln n - n) \\
+      &= \lim_{n \to \infty} c_f (\ln n)^2 - n \ln n + n \\
+      &= -\infty \qquad (\text{since } n \ln n \text{ grows faster than } (\ln n)^2 \text{ and } n) \\
+      \Rightarrow L &= 0
+    \end{align*}
+
+    \item[$f_a < f_c$] Let $L = \lim_{n \to \infty} \frac{f_a(n)}{f_c(n)}$.
+    \begin{align*}
+      \ln L &= \lim_{n \to \infty} \ln f_a(n) - \ln f_c(n) \\
+      &= \lim_{n \to \infty} \ln n! - n^3 \ln 2
+    \end{align*}
+    Again, using Stirling's approximation, we get:
+    \begin{align*}
+      \ln L &= \lim_{n \to \infty} (n \ln n - n) - n^3 \ln 2 \\
+      &= -\infty \qquad (\text{since } n^3 \text{ grows faster than } n \ln n) \\
+      \Rightarrow L &= 0
+    \end{align*}
+  \end{itemize}
+
+\section{Problem 6}
+
+  \begin{enumerate}[label=(\alph*)]
+    \item Since $f(n) \in O(s(n))$, $\exists c_1 > 0, n_1 \in \mathbb{N}$ such that:
+    \[ f(n) \leq c_1 s(n) ~ \forall n \geq n_1 \tag{1} \]
+    Also, we know $g(n) \in O(f(n))$, therefore $\exists c_2 > 0, n_2 \in \mathbb{N}$ such that:
+    \[ g(n) \leq c_2 f(n) ~ \forall n \geq n_2 \]
+    Let $N = \max(n_1, n_2)$, then:
+    \[ g(n) \leq c_2 f(n) \leq c_2 c_1 s(n) ~ \forall n \geq N \tag{2} \]
+    Adding (1) and (2):
+    \[ f(n) + g(n) \leq c_1 s(n) + c_2 c_1 s(n) = (c_1 + c_2 c_1)s(n) ~ \forall n \geq N \]
+    Writing $C = c_1 + c_2 c_1$, we have:
+    \[ f(n) + g(n) \leq C s(n) ~ \forall n \geq N \]
+    Hence proving $f(n) + g(n) \in O(s(n))$.
+
+    \item Take the case $f(n) = n$, $g(n) = r(n) = n^2$, and $s(n) = n^3$.
+    Clearly, $f(n) \in O(s(n))$, $g(n) \in O(r(n))$, and $r(n) \in O(s(n))$ but $g(n) \notin O(f(n))$ since $n^2$ grows faster than $n$.
+
+    \item Take the case $f(n) = s(n) = 1$, $g(n) = n$, and $r(n) = n^2$.
+    Clearly, $f(n) \in O(s(n))$ and $g(n) \in O(r(n))$ but $\left( \frac{f(n)}{g(n)} \right) \notin O\left( \frac{s(n)}{r(n)} \right)$ since $1 / n$ grows faster than $1 / n^2$
+  \end{enumerate}
+
+\section{Problem 7}
+
+  Using $n$ increments, we can see that the $k$th bit switches $n / 2^k$ times.
+  Combining this with the fact that the cost to switch the $k$th bit is $k + 1$, the total cost required to switch the $k$th bit over $n$ increments is $n \cdot (k + 1) / 2^k$.
+  Assuming the total number of bits is $K \approx \log_2 n$ the total cost for $n$ increments is:
+  \[ T(n) = \sum_{k=0}^{K} n \cdot \frac{(k + 1)}{2^k} \]
+  Hence the amortized cost is:
+  \[
+    \lim_{n \to \infty} \frac{T(n)}{n} = \sum_{k=0}^{\infty} \frac{k + 1}{2^k}
+    \qquad (n \to \infty \Rightarrow K \to \infty)
+  \]
+  To calculate this sum, consider the function:
+  \begin{align*}
+    f(x) &= \sum_{k=0}^{\infty} x^{k+1} \quad x \in (0, 1) \\
+    &= \frac{1}{1 - x}
+  \end{align*}
+  Notice that $f'(1/2)$ gives us the required sum:
+  \begin{align*}
+    f(x) &= \sum_{k=0}^{\infty} x^{k+1} \\
+    \Rightarrow f'(x) &= \sum_{k=0}^{\infty} (k + 1) x^k \\
+    \Rightarrow f'(1/2) &= \sum_{k=0}^{\infty} \frac{k + 1}{2^k}
+  \end{align*}
+  Calculating $f'(x)$:
+  \begin{align*}
+    f(x) &= \frac{1}{1 - x} \\
+    \Rightarrow f'(x) &= \frac{-1}{(1 - x)^2} \cdot -1 \\
+    &= \frac{1}{(1 - x)^2} \\
+    \Rightarrow f'(1/2) &= 4 \\
+    \Rightarrow \lim_{n \to \infty} \frac{T(n)}{n} &= 4 \in O(1)
+  \end{align*}
+  Therefore, the amortized cost is constant.
+
+\section{Problem 8}
+
+  Let $d_{k-1} d_{k-2} \dots d_1 d_0$ be such a k-digit number with digits $d_i, i \in \{0, 1, \dots, k-1\}$.
+  Since $d_{k-1} d_{k-2} \dots d_1 d_0$ is also a binary representation, we get $d_i \in \{0, 1\} ~ \forall i \in \{0, 1, \dots, k-1\}$.
+  We want to find all k-digit numbers such that $(d_{k-1} d_{k-2} \dots d_1 d_0)_2 = (d_{k-1} d_{k-2} \dots d_1 d_0)_{10}$.
+  Mathematically, we need:
+  \begin{align*}
+    &(d_{k-1} d_{k-2} \dots d_1 d_0)_2 = (d_{k-1} d_{k-2} \dots d_1 d_0)_{10} \\
+    &\Rightarrow \sum_{i=0}^{k-1} d_i 2^i = \sum_{i=0}^{k-1} d_i 10^i \\
+    &\Rightarrow \sum_{i=0}^{k-1} d_i (10^i - 2^i) = 0 \\
+    &\Rightarrow \sum_{i=1}^{k-1} d_i (10^i - 2^i) + d_0 (10^0 - 2^0) = 0 \\
+    &\Rightarrow \sum_{i=1}^{k-1} d_i (10^i - 2^i) = 0 \tag{1}
+  \end{align*}
+  Notice that $10^i - 2^i > 0$ and $d_i \geq 0 ~ \forall i \in \{1, 2, \dots, k-1\}$.
+  Hence, for (1) to hold, we must have $d_i = 0 ~ \forall i \in \{1, 2, \dots, k-1\}$.
+  Therefore, the only k-digit numbers satisfying the condition are of the form $d_0$.
+  Or, in other words, the only possible value of $k$ is 1.
+  Apart from this, we have no additional constraints over $d_0$.
+  Therefore, the only numbers satisfying the required conditions are 0 and 1.
+
+\end{document}

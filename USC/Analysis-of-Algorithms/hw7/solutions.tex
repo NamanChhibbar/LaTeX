@@ -1,0 +1,185 @@
+\documentclass{article}
+
+% Margins and spacing
+\usepackage[a4paper, margin=.7in]{geometry}
+% Math packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+% Placement of figures, tables, algorithms, etc.
+\usepackage{float}
+% Algorithms
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{tikz}
+
+% No section numbering
+\setcounter{secnumdepth}{0}
+% No paragraph indentation
+\setlength{\parindent}{0pt}
+
+% Define custom commands
+%% Operators
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+%% Manually indented state in algorithmic environment
+\newcommand{\IndentState}{\State \hspace{1em}}
+
+\title{CSCI-570 Homework 5 Solutions}
+\author{
+  Naman Chhibbar \\
+  USC ID: 7709-8548-02
+}
+\date{}
+
+% Document body
+\begin{document}
+\maketitle
+
+\section{Problem 1}
+  \begin{itemize}
+    \item[(a)] Let $E' = (V \times V) \backslash E$ be the set of edges in $\overline{G}$.
+    Suppose $S$ is independent in $G$.
+    Then, by definition, $(u, v) \notin E ~ \forall u, v \in S \Rightarrow (u, v) \in E' ~ \forall u, v \in S$.
+    Hence, by definition, $S$ is a clique in $\overline{G}$. \\
+    Now assume $S$ is a clique in $\overline{G}$.
+    Then, by definition, $(u, v) \in E' ~ \forall u, v \in S \Rightarrow (u, v) \notin E ~ \forall u, v \in S$.
+    Hence, again by definition, $S$ is independent in $G$.
+    Therefore, $S$ is independent in $G$ iff (if and only if) it is a clique in $\overline{G}$.
+
+    \item[(b)] Given an instance of \textit{clique} defined by a graph $G = (V, E)$ and an integer $k$, and a solution $S$, we can verify the solution in polynomial time using the following algorithm:
+    \begin{algorithm}[h!]
+      \caption{Verify solution $S$ for \textit{clique} decision problem}
+      \begin{algorithmic}[1]
+        \State \textbf{Input}: A graph $G = (V, E)$, an integer $k$, and a set of vertices $S$
+        \State \textbf{Output}: \textbf{true} if $S$ is a clique of size at least $k$ in $G$, \textbf{false} otherwise
+        \If{$|S| < k$}
+          \State \textbf{return} \textbf{false}
+        \EndIf
+        \For{$u, v \in S$}
+          \If{$(u, v) \notin E$}
+            \State \textbf{return} \textbf{false}
+          \EndIf
+        \EndFor
+        \State \textbf{return} \textbf{true}
+      \end{algorithmic}
+    \end{algorithm} \\
+    It is easy to see that this algorithm runs in $O(|S|^2)$ time ($O(|S|^2|E|)$ in the worst case if we need to check for edge existence), hence proving that \textit{clique} is in $\mathcal{NP}$. \\
+    Now consider another decision problem \textit{independent subset} defined as finding if there exists an independent set of size at least $k$ in a given graph $G = (V, E)$.
+    Since \textit{independent set} is a known $\mathcal{NP}$-complete (which also makes it $\mathcal{NP}$-hard) problem, we will be done if we prove that it is reducible to \textit{clique} in polynomial time. \\
+    By part (a), we know that an independent set $S$ in $G$ is a clique in $\overline{G}$.
+    Hence, reducing \textit{independent subset} to \textit{clique} is as simple as computing $\overline{G}$.
+    Here is a simple algorithm to compute $\overline{G}$:
+    \begin{algorithm}[h!]
+      \caption{Compute the complement $\overline{G}$ of a graph $G = (V, E)$}
+      \begin{algorithmic}[1]
+        \State \textbf{Input}: A graph $G = (V, E)$
+        \State \textbf{Output}: The complement graph $\overline{G} = (V, E')$
+        \State Initialize $E' \gets \{\}$
+        \For{each $u, v \in V$}
+          \If{$(u, v) \notin E$}
+            \State $E' \gets E' \cup \{(u, v)\}$
+          \EndIf
+        \EndFor
+        \State \textbf{return} $\overline{G} = (V, E')$
+      \end{algorithmic}
+    \end{algorithm} \\
+    It is easy to see that this algorithm runs in $O(|V|^2)$ time ($O(|V|^2|E|)$ in the worst case if we need to check for edge existence), hence proving this reduction is polynomial.
+    Therefore, \textit{clique} is also $\mathcal{NP}$-hard. \\
+    Since \textit{clique} is in $\mathcal{NP}$ and is $\mathcal{NP}$-hard, we conclude it is $\mathcal{NP}$-complete.
+  \end{itemize}
+
+\section{Problem 2}
+  We can use \textbf{Algorithm 1} from Problem 1 with $k = n/2$ to verify a solution for \textit{half-clique} in polynomial time.
+  Hence, \textit{half-clique} is in $\mathcal{NP}$. \\
+  Now, from Problem 1, we know that the \textit{clique} decision problem is $\mathcal{NP}$-complete (and also $\mathcal{NP}$-hard).
+  Hence, we will be done if we show that any instance of \textit{clique} can be reduced to an instance of \textit{half-clique} in polynomial time. \\
+  Suppose we have an instance of \textit{clique} defined by a graph $G = (V, E)$ and an integer $k$.
+  \begin{itemize}
+    \item \textbf{Case 1:} $k \ge n/2$ \\
+    Construct a new graph $G' = (V', E)$ with $V' = V \cup U$ where $U$ is a set of $(2k - n)$ new vertices.
+    Since we have the same edge set, none of these vertices are connected to any other vertex.
+    Note that $|V'| = n + (2k - n) = 2k$, so a solution to \textit{half-clique} on $G'$ will determine if $G'$ has a clique of size at least $k$.
+    Since none of the new vertices are connected to any other vertex, any clique in $G'$ will contain vertices only from $V$, which means any clique in $G'$ is also a clique in $G$.
+    Hence, $G$ has a clique of size at least $k$ iff $G'$ has a clique of size at least $|V'|/2$.
+    Also, constructing $G'$ takes $O(1)$ time in this case since we just need to add the new vertices to $V$.
+
+    \item \textbf{Case 2:} $k < n/2$ \\
+    Construct a new graph $G' = (V', E')$ with $V' = V \cup U$ where $U$ is a set of $(n - 2k)$ new vertices and $E' = E \cup \{(u, v) \mid u \in U, v \in V', u \neq v\}$, which mean every new vertex is connected to every other vertex in $G'$.
+    A key observation here is that any clique in $G'$ must contain all vertices in $U$; otherwise, we can extend any clique with the vertices in $U$ (since these are connected to every other vertex) to form a larger clique. \\
+    Note that $|V'| = n + (n - 2k) = 2(n - k)$, so a solution to \textit{half-clique} on $G'$ will determine if $G'$ has a clique of size at least $(n - k)$.
+    If it does, then we can obtain a clique of size at least $(n - k) - (n - 2k) = k$ in $G$ by removing the vertices in $U$.
+    If it doesn't, we can conclude that there is no clique of size at least $k$ in $G$; otherwise we can extend the clique in $G$ to a larger clique in $G'$ by adding all of the vertices in $U$ of size at least $k + (n - 2k) = n - k$, which would be a contradiction.
+    Hence, $G$ has a clique of size at least $k$ iff $G'$ has a clique of size at least $|V'|/2$.
+    Also, constructing $G'$ takes $O(n^2)$ time (two loops over $U$ and $V$ to add the edges; $|U| = n - 2k = O(n)$) in this case.
+  \end{itemize}
+  Hence, we have shown that any instance of \textit{clique} can be reduced to an instance of \textit{half-clique} in polynomial time, proving \textit{half-clique} is also $\mathcal{NP}$-hard. \\
+  Since \textit{half-clique} is in $\mathcal{NP}$ and is $\mathcal{NP}$-hard, we conclude it is $\mathcal{NP}$-complete.
+
+\section{Problem 3}
+  Suppose we have an instance of the given decision problem defined by the variables $x_1, x_2, \dots, x_n$, clauses $C_1, C_2, \dots, C_m$, and the integer $k$.
+  We assume that each clause is an array of variables, defining that clause.
+  Having this, let the set of variables $S$ be a solution to the problem.
+  We can verify this solution using the following algorithm:
+  \begin{algorithm}[h!]
+    \caption{Verify solution $S$ for the given decision problem}
+    \begin{algorithmic}[1]
+      \State \textbf{Input}: Variables $x_1, x_2, \dots, x_n$, clauses $C_1, C_2, \dots, C_m$, integer $k$, and a set of variables $S$
+      \State \textbf{Output}: \textbf{true} if $S$ satisfies all clauses by setting at most $k$ variables to 1, \textbf{false} otherwise
+      \If{$|S| > k$}
+        \State \textbf{return} \textbf{false}
+      \EndIf
+      \For{$i = 1 \to m$}
+        \State $satisfied \gets$ \textbf{false}
+        \For{$x \in C_i$}
+          \If{$x \in S$}
+            \State $satisfied \gets$ \textbf{true}
+            \State \textbf{break}
+          \EndIf
+        \EndFor
+        \If{not $satisfied$}
+          \State \textbf{return} \textbf{false}
+        \EndIf
+      \EndFor
+      \State \textbf{return} \textbf{true}
+    \end{algorithmic}
+  \end{algorithm} \\
+  It is easy to see that this algorithm runs in $O(mn)$ time (maximum number of variables in any clause is the number of variables $n$), hence proving that the given decision problem is in $\mathcal{NP}$. \\
+  Now consider the known $\mathcal{NP}$-complete problem \textit{Vertex Cover} defined as: given a graph, find the minimal set of vertices such that every edge in the graph contains a vertex from this set. \\
+  We will use the decision problem \textit{Modified Vertex Cover} derived from \textit{Vertex Cover} defined as: given a graph $G = (V, E)$ and an integer $k$, does there exist a vertex cover of size at most $k$?
+  This problem is $\mathcal{NP}$-hard since any instance of \textit{Vertex Cover} can be reduced to an instance of \textit{Modified Vertex Cover} in polynomial time by the following algorithm:
+  \begin{algorithm}
+    \caption{Reduction from \textit{Vertex Cover} to \textit{Modified Vertex Cover}}
+    \begin{algorithmic}[1]
+      \State \textbf{Input}: A graph $G = (V, E)$
+      \State \textbf{Output}: Minimal vertex cover of $G$
+      \For{$k = 1 \to |V| - 1$}
+        \State $S \gets \{\}$
+        \For{$v \in V$}
+          \If{\Call{ModifiedVertexCover}{$G, k, S \cup \{v\}$} is true}
+            \State $S \gets S \cup \{v\}$
+            \State $k \gets k - 1$
+          \EndIf
+        \EndFor
+        \If{$k = 0$}
+          \State \textbf{return} $S$
+        \EndIf
+      \EndFor
+      \State \textbf{return} $V$
+    \end{algorithmic}
+  \end{algorithm} \\
+  Here, we assume we have the function \textsc{ModifiedVertexCover}$(G, k, S)$ that solves the decision problem \textit{Modified Vertex Cover} such that the vertex cover contains the vertex set $S$ (adding this modification to \textsc{ModifiedVertexCover} is easy since we will inevitably need to check for vertices in this function).
+  This algorithm works by iteratively checking if there exists a vertex cover of size $1, 2, \dots, |V| -1$ and keeps track of the vertices in the vertex cover.
+  It is easy to verify that this reduction runs in polynomial time, proving that \textit{Modified Vertex Cover} is $\mathcal{NP}$-hard. \\
+  Now, we will reduce \textit{Modified Vertex Cover} to the given decision problem in polynomial time to prove $\mathcal{NP}$-hardness.
+  Given an instance of \textit{Modified Vertex Cover} defined by a graph $G = (V, E)$ and an integer $k$, here is the reduction:
+  \begin{itemize}
+    \item Construct the variables $x_1, x_2, \dots, x_n$, where $n = |V|$ and each variable $x_i$ corresponds to a vertex $v_i \in V$.
+    For simplicity, we will denote both the vertices and variables as $x_1, x_2, \dots, x_n$.
+    \item For each edge $(x_i, x_j) \in E$, construct the clause $(x_i \lor x_j)$.
+    \item An assignment that satisfies all of the clauses by setting at most $k$ variables to 1 will correspond to a vertex cover of size at most $k$ in $G$.
+  \end{itemize}
+  The above reduction works because at least one variable in each clause must be 1 to satisfy all of the clauses and since each clause represents an edge, the variables that are 1 make the vertex cover in the graph.
+  We can also easily verify that this reduction runs in $O(|V| + |E|)$ time, which is polynomial.
+  Therefore, since \textit{Modified Vertex Cover} is $\mathcal{NP}$-hard, the given decision problem is also $\mathcal{NP}$-hard. \\
+  We have proven that the given decision problem is in $\mathcal{NP}$ and is $\mathcal{NP}$-hard, hence it is $\mathcal{NP}$-complete.
+\end{document}

@@ -1,0 +1,308 @@
+\documentclass{article}
+
+% Margins and spacing
+\usepackage[a4paper, margin=.7in]{geometry}
+% Math packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+% Placement of figures, tables, algorithms, etc.
+\usepackage{float}
+% Algorithms
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% No section numbering
+\setcounter{secnumdepth}{0}
+% No paragraph indentation
+\setlength{\parindent}{0pt}
+
+% Define custom commands
+%% Operators
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+%% Manually indented state in algorithmic environment
+\newcommand{\IndentState}{\State \hspace{1em}}
+
+\title{CSCI-570 Homework 4 Solutions}
+\author{
+  Naman Chhibbar \\
+  USC ID: 7709-8548-02
+}
+\date{}
+
+% Document body
+\begin{document}
+\maketitle
+
+\section{Problem 1}
+  Let $\textsc{SubsetSum}(A, m, n)$ be the required algorithm for an array $A$ of size $m$ and target sum $n$.
+  The algorithm returns \texttt{True} if there exists a subset of $A$ that sums to $n$, and \texttt{False} otherwise.
+  Note that this problem can be easily broken down into subproblems as:
+  \[
+    \textsc{SubsetSum}(A, m, n) =
+    \underbrace{\textsc{SubsetSum}(A[1:m-1], m-1, n)}_{\text{exclude } A[0]}
+    \lor \underbrace{\textsc{SubsetSum}(A[1:m-1], m-1, n - A[0])}_{\text{include } A[0]}
+    \tag{1}
+  \]
+  where $A[i:j]$ is the subarray of $A$ from index $i$ to $j$ (both inclusive) while following 0-based indexing and $\lor$ denotes the logical or operation (we assume $A$ to be of length more than one for generalization; the base cases are covered later).
+  Let $M$ be the memory matrix of size $(m+1) \times (n+1)$ defined as $M[i][j] = \textsc{SubsetSum}(A[0:i], i, j)$.
+  From (1), we have:
+  \[ M[i][j] = M[i-1][j] \lor M[i-1][j - A[i-1]] \]
+  Note that the $i$th row of $M$ only depends on the $(i-1)$th row.
+  Thus, we can optimize the space complexity of the algorithm by storing only two rows of $M$ at any time.
+  The algorithm becomes:
+  \begin{algorithm}
+    \caption{Subset Sum}
+    \begin{algorithmic}[1]
+      \State \textbf{Input:} Array $A$ of $m$ positive integers, target sum $n > 0$
+      \State \textbf{Output:} \texttt{True} if there exists a subset of $A$ that sums to $n$, \texttt {False} otherwise
+      \State Initialize $M$ of size $2 \times (n+1)$ with $M[0][0] = \texttt{True}$ and $M[0][j] = \texttt{False}$ for $j > 0$
+      \For{$i = 0 \to (m-1)$}
+        \For{$j = 0 \to n$}
+          \If{$j < A[i]$}
+            \State $M[1][j] \gets M[0][j]$
+          \Else
+            \State $M[1][j] \gets M[0][j] \lor M[0][j - A[i]]$
+          \EndIf
+        \EndFor
+      \EndFor
+      \State \Return $M[1][n]$
+    \end{algorithmic}
+  \end{algorithm}
+  
+  We can see that we do a constant amount of work in each iteration of the loops.
+  Thus, the time complexity of the algorithm is $O(mn)$ and the space complexity is $O(n)$.
+  The time complexity is polynomial in $m$ but, since $n$ is an integer, the time and space complexity is pseudo-polynomial in $n$.
+
+\section{Problem 2}
+  Note that the robot can reach the lower right corner by taking exactly $m$ down steps and $n$ right steps in any order ($m$ being the number of rows arranged horizontally and $n$ being the number of columns).
+  Hence, the number of possible ways is the number of permutations of:
+  \[ \underbrace{\downarrow \downarrow \cdots \downarrow}_{m} \underbrace{\rightarrow \rightarrow \cdots \rightarrow}_{n} \]
+  which is $\frac{(m+n)!}{m!n!}$.
+  To reduce the number of computations, we can compute it as $\frac{(m+1)(m+2) \cdots (m+n)}{n!}$ if $m \ge n$ or $\frac{(n+1)(n+2) \cdots (m+n)}{m!}$ otherwise.
+  The algorithm becomes:
+  \begin{algorithm}[H]
+    \caption{Number of Paths}
+    \begin{algorithmic}[1]
+      \State \textbf{Input:} Integers $m, n$
+      \State \textbf{Output:} Number of unique paths from top-left to bottom-right of an $m \times n$ grid
+      \State $numerator = 1$
+      \State $denominator = 1$
+      \If{$m \ge n$}
+        \For{$i = 1 \to n$}
+          \State $numerator \gets numerator \times (m + i)$
+          \State $denominator \gets denominator \times i$
+        \EndFor
+      \Else
+        \For{$i = 1 \to m$}
+          \State $numerator \gets numerator \times (n + i)$
+          \State $denominator \gets denominator \times i$
+        \EndFor
+      \EndIf
+      \State \Return $numerator / denominator$
+    \end{algorithmic}
+  \end{algorithm}
+
+  Since we do a constant amount of work in each iteration of the loop, the time complexity of the algorithm is $O(\min(m, n))$.
+
+\section{Problem 3}
+  Let \textsc{LongestPalindrome}($S, n$) be the required algorithm that returns the length of the longest palindromic subsequence in the string $S$ of length $n$.
+  Note that the problem can be broken down as:
+  \[
+    \textsc{LP}(S, n) =
+    \begin{cases}
+      \textsc{LP}(S[1:n-2], n-2) + 2 & S[0] = S[-1] \\
+      \max\{
+        \underbrace{\textsc{LP}(S[0:n-2], n-1)}_{\text{choose } S[0]},
+        \underbrace{\textsc{LP}(S[1:n-1], n-1)}_{\text{choose } S[n - 1]}
+      \}
+        & \text{otherwise}
+    \end{cases}
+    \tag{1}
+  \]
+  where $S[i:j]$ is the substring of $S$ from index $i$ to $j$ (both inclusive) while following 0-based indexing and \textsc{LP} denotes the algorithm \textsc{LongestPalindrome} (assuming $S$ is of length more than 2 for generalization; bases cases are covered later).
+  Let $M$ be the memory matrix of size $n \times n$ defined cleverly as $M[i][j] = \textsc{LP}(S[j:i+j-1], i)$.
+  Let's generalize (1) for indices $i$ to $j$:
+  \[
+    \textsc{LP}(S[i:j], j-i+1) =
+    \begin{cases}
+      0 & i > j \\
+      1 & i = j \\
+      \textsc{LP}(S[i+1:j-1], j-i-1) + 2 & S[i] = S[j] \\
+      \max\{
+        \underbrace{\textsc{LP}(S[i:j-1], j-i)}_{\text{choose } S[i]},
+        \underbrace{\textsc{LP}(S[i+1:j], j-i)}_{\text{choose } S[j]}
+      \}
+        & \text{otherwise}
+    \end{cases}
+  \]
+  Substituting $i \to j$ and $j \to i + j - 1$, we get:
+  \[
+    \textsc{LP}(S[j:i+j-1], i) =
+    \begin{cases}
+      0 & i < 1 \Rightarrow i = 0 \\
+      1 & i = 1 \\
+      \textsc{LP}(S[j+1:i+j-2], i-2) + 2 & S[j] = S[i+j-1] \\
+      \max\{\textsc{LP}(S[j:i+j-2], i-1), \textsc{LP}(S[j+1:i+j-1], i-1)\} & \text{otherwise}
+    \end{cases}
+    \tag{2}
+  \]
+  From (2), we can define $M$ as:
+  \[
+    M[i][j] =
+    \begin{cases}
+      0 & i = 0 \\
+      1 & i = 1 \\
+      M[i-2][j+1] + 2 & S[j] = S[i+j-1] \\
+      \max\{M[i-1][j], M[i-1][j+1]\} & \text{otherwise}
+    \end{cases}
+  \]
+  Due to the way we defined $M$, we can see that again the $i$th row of $M$ only depends on the rows $(i-1)$ and $(i-2)$.
+  Hence, we can optimize the space complexity by storing only three rows of $M$ at a time.
+  Also, the required answer is $M[n][0] = \textsc{LongestPalindrome}(S[0:n-1], n)$.
+  Note that, since $M[i][j]$ depends on values in column $j$ and $j+1$, we need to iterate $j$ from $n-i$ to $0$.
+  Also note that the values of $M$ are not defined for $j > n - i$ (since $i + j - 1 \le n - 1 \Rightarrow j \le n - i$ must hold).
+  The algorithm becomes:
+  \begin{algorithm}
+    \caption{Longest Palindromic Subsequence}
+    \begin{algorithmic}[1]
+      \State \textbf{Input:} String $S$ of length $n$
+      \State \textbf{Output:} Length of the longest palindromic subsequence in $S$
+      \State Initialize $M$ of size $3 \times n$ with $M[0][j] = 0$ and $M[1][j] = 1$ for all $j$, $M[1][n] = 0$
+      \For{$i = 2 \to n$}
+        \For{$j = n-i \to 0$}
+          \If{$S[j] = S[i+j-1]$}
+            \State $M[2][j] \gets M[0][j+1] + 2$
+          \Else
+            \State $M[2][j] \gets \max\{M[1][j], M[1][j+1]\}$
+          \EndIf
+        \EndFor
+        \For{$k = 0 \to n$}
+        \State $M[0][k] \gets M[1][k]$
+        \State $M[1][k] \gets M[2][k]$
+        \EndFor
+      \EndFor
+      \State \Return $M[1][0]$
+    \end{algorithmic}
+  \end{algorithm}
+
+  Since we have two nested loops doing a constant amount of work in each iteration, the time complexity of the algorithm is $O(n^2)$.
+  And the space complexity is $O(n)$ since we are storing only three rows of $M$ at any time.
+
+\section{Problem 4}
+  Consider three lines $L_i, L_j, L_k$ with the parameters $(a_i, b_i)$, $(a_j, b_j)$, and $(a_k, b_k)$ respectively.
+  Line $L_i$ is visible if $\exists x \in \mathbb{R}$ such that:
+  \begin{align*}
+    a_i x + b_i &> a_j x + b_j \\
+    \Rightarrow (a_i - a_j) x &> b_j - b_i \\
+  \end{align*}
+  Similarly, we also have $(a_i - a_k) x > b_k - b_i$.
+  Assuming $a_j < a_i < a_k$, we have:
+  \begin{align*}
+    x > \frac{b_j - b_i}{a_i - a_j} \quad &\text{and} \quad x < \frac{b_k - b_i}{a_i - a_k} \\
+    \Rightarrow \frac{b_j - b_i}{a_i - a_j} &< x < \frac{b_k - b_i}{a_i - a_k}
+  \end{align*}
+  Hence, $L_i$ is visible if $\frac{b_j - b_i}{a_i - a_j} < \frac{b_k - b_i}{a_i - a_k}$.
+  We can use this as a check to see if a line is visible, given two other lines having slopes like $a_j, a_k$. \\
+  Also, note that if we have parallel lines $L_1, \ldots, L_n$, only $L_i$ will be visible where $i = \argmax_{j \in \{1, \ldots, n\}} b_j$. \\
+  The required algorithm is:
+  \begin{algorithm}[H]
+    \caption{Visible Lines}
+    \begin{algorithmic}[1]
+      \State \textbf{Input:} Array $L$ of $n$ lines where $L[i] = (a_i, b_i)$
+      \State \textbf{Output:} Array of visible lines in $L$
+      \State Sort $L$ in increasing order of $a_i$
+      \State Initialize new empty array $L'$
+      \Comment To remove lines with same slopes
+      \State $L'[0] \gets L[0]$
+      \State $n' = 1$
+      \Comment Length of $L'$
+      \State $slope = L[0][0]$
+      \For{$i = 1 \to (n-1)$}
+        \If{$L[i][0] \ne slope$}
+          \State $L'[n'] \gets L[i]$
+          \State $slope \gets L[i][0]$
+          \State $n' \gets n' + 1$
+        \ElsIf{$L[i][1] > L'[n'-1][1]$}
+          \State $L'[n'-1] \gets L[i]$
+        \EndIf
+      \EndFor
+      \State Initialize empty array $V$
+      \Comment To store visible lines
+      \State $length = 0$
+      \Function{VisibleLines}{$L, n$}
+        \If{$n \le 2$}
+          \State \Return $L$
+        \EndIf
+        \State $mid \gets \lfloor n/2 \rfloor$
+        \State $left = \textsc{VisibleLines}(L[0:mid-1], mid)$
+        \State $right = \textsc{VisibleLines}(L[mid:n-1], n - mid)$
+        \State $i \gets mid - 1$
+        \State $j \gets 0$
+        \While{$i \ge 0$ or $j < n - mid$}
+          \Comment Merge
+          \If{$i = 0$}
+            \State $V[length] \gets L[j]$
+            \State $length \gets length + 1$
+            \State $j \gets j + 1$
+          \ElsIf{$j = n - mid$}
+            \State $V[length] \gets L[i]$
+            \State $length \gets length + 1$
+            \State $i \gets i - 1$
+          \EndIf
+          \If{$\frac{left[i-1][1] - left[i][1]}{left[i][0] - left[i-1][0]} < \frac{right[j+1][1] - left[j][1]}{left[i][0] - right[j][0]}$}
+            \State $V[length] \gets L[i]$
+            \State $length \gets length + 1$
+            \State $i \gets i - 1$
+          \EndIf
+          \If{$\frac{left[i][1] - right[j][1]}{right[j][0] - left[i][0]} < \frac{right[j+1][1] - right[j][1]}{right[j][0] - right[j+1][0]}$}
+            \State $V[length] \gets L[j]$
+            \State $length \gets length + 1$
+            \State $j \gets j + 1$
+          \EndIf
+        \EndWhile
+        \State \Return $V$
+      \EndFunction
+      \State \Return \textsc{VisibleLines}($L', n'$)
+    \end{algorithmic}
+  \end{algorithm}
+
+\section{Problem 5}
+  Let's model this data structure using an array.
+  The children of the node at index $i$ will be at indices $2i + 1$ and $2i + 2$.
+  Let \textsc{MaximumSum}($T, n, i$) be the required algorithm, where $T$ is the array storing the triangle, $n$ is the number of numbers in the triangle (or length of $T$), and $i$ is used to denote the index of the current root (will be used later).
+  It is easy to see the following relation:
+  \[
+    \textsc{MaximumSum}(T, n, i) = T[i] + \max\{
+      \underbrace{\textsc{MaximumSum}(T, n, 2i+1)}_{\text{path through } child1},
+      \underbrace{\textsc{MaximumSum}(T, n, 2i+2)}_{\text{path through } child2}
+    \}
+  \]
+  The required algorithm is:
+  \begin{algorithm}
+    \caption{Maximum Path Sum in Triangle}
+    \begin{algorithmic}[1]
+      \State \textbf{Input:} Triangle as an array $T$ of size $n$
+      \Comment $T[0]$ is the root of the triangle
+      \State \textbf{Output:} Maximum path sum from top to bottom of the triangle
+      \State Initialize an empty array $M$ of size $n$ with $M[i] = \texttt{None} ~ \forall i \in \{0, \ldots, n-1\}$
+      \Function{MaximumSum}{$T, n, i$}
+        % \If{$n = 1$}
+        %   \State \Return $T[0]$
+        % \EndIf
+        \If{$M[i] = \texttt{None}$}
+          \If{$2i + 1 \ge n$}
+            \State $M[i] \gets T[i]$
+          \ElsIf{$2i + 2 \ge n$}
+            \State $M[i] \gets T[i] + \textsc{MaximumSum}(T, n, 2i+1)$
+          \Else
+            \State $M[i] \gets T[i] + \max\{\textsc{MaximumSum}(T, n, 2i+1), \textsc{MaximumSum}(T, n, 2i+2)\}$
+          \EndIf
+        \EndIf
+        \State \Return $M[i]$
+      \EndFunction
+      \State \Return \textsc{MaximumSum}($T, n, 0$)
+    \end{algorithmic}
+  \end{algorithm}
+
+\end{document}

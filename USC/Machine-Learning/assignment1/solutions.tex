@@ -1,0 +1,251 @@
+\documentclass{article}
+\usepackage[a4paper, margin=.7in]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{nameref}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% No section numbering
+\setcounter{secnumdepth}{0}
+% No paragraph indentation
+\setlength{\parindent}{0pt}
+
+% Define custom commands
+%% Bold-italic math symbols
+\newcommand{\mathbi}[1]{\boldsymbol{#1}}
+%% Manually indented state in algorithmic environment
+\newcommand{\IndentState}{\State \hspace{2em}}
+
+\title{CSCI-567 Assignment 1 Solutions}
+\author{
+  Naman Chhibbar \\
+  USC ID: 7709-8548-02
+}
+\date{}
+
+% Document body
+\begin{document}
+\maketitle
+
+\section{Problem 1}
+
+  \begin{itemize}
+    \item[1.] The test point $A$ is located at $(8, 8)$.
+    We are using $K = 1$, which means the test point will be classified based on the nearest point.
+    The point closest to $A$, using the Manhattan distance ($L_1$ distance), is a circle at $(8, 6)$.
+    Hence, $A$ is classified as a circle.
+
+    \item[2.] The test point $B$ is located at $(8, 4)$.
+    The smallest odd value of $K$ that would classify $B$ as a triangle is $K = 5$, which will choose the three triangles at $(6, 2)$, $(5, 6)$, and $(6, 6)$ and the two circles at $(5, 4)$ and $(8, 6)$ and hence classify $B$ as a triangle.
+    If $K = 3$, the nearest neighbors would be the two circles at $(8, 6)$ and $(5, 4)$ and one triangle at $(6, 2)$, which would classify $B$ as a circle.
+    If $K = 1$, the nearest neighbor would be the circle at $(8, 6)$, which would again classify $B$ as a circle.
+
+    \item[3.] For $K = 1$ and using $N$-fold cross validation, we can easily see that all four square points will be classified correctly since every square is at a distance of 1 from another square.
+    We can also clearly see that every circle will be classified incorrectly since every circle's nearest neighbor is a triangle at a distance of 2.
+    Finally, the triangles at $(5, 6)$ and $(6, 6)$ will be classified correctly since they are at a distance of 1 from each other, while the triangle at $(6, 2)$ will be classified incorrectly since its nearest neighbor is a circle at $(5, 4)$.
+    Hence, the averaged error rate is $4 / 10 = 0.4$ ($N = 10$ and the number of misclassified points is 4).
+  \end{itemize}
+
+\section{Problem 2}
+
+  \begin{itemize}
+    \item[\textbf{2.1}]
+    \begin{itemize}
+      \item[1.] We can easily see this by choosing $\mathbi{M} = \lambda \mathbi{I}$, where $\lambda > 0$ (this makes $\mathbi{M}$ positive-definite) and $\mathbi{I}$ is the identity matrix of size $D \times D$:
+      \begin{align*}
+        \mathbi{w}^T \mathbi{M} \mathbi{w} &= \mathbi{w}^T (\lambda \mathbi{I}) \mathbi{w} \\
+        &= \lambda \mathbi{w}^T \mathbi{w} \\
+        &= \lambda ||\mathbi{w}||_2^2 \\
+      \end{align*}
+      Therefore, this becomes the standard L2 regularization with $\lambda$ as the regularization coefficient.
+
+      \item[2.] We have:
+      \begin{align*}
+        F(\mathbi{w}) &= ||\mathbi{X} \mathbi{w} - \mathbi{y}||_2^2 + \mathbi{w}^T \mathbi{M} \mathbi{w} \\
+        \Rightarrow \nabla F(\mathbi{w}) &= 2 \mathbi{X}^T (\mathbi{X} \mathbi{w} - \mathbi{y}) + 2 \mathbi{M} \mathbi{w} \tag{1} \\
+      \end{align*}
+      Equating (1) to 0, we get:
+      \[ \nabla F(\mathbi{w}'_*) = 0 \]
+      \[ \Rightarrow 2 \mathbi{X}^T (\mathbi{X} \mathbi{w}'_* - \mathbi{y}) + 2 \mathbi{M} \mathbi{w}'_* = 0 \]
+      \[ \Rightarrow (\mathbi{X}^T \mathbi{X} + \mathbi{M}) \mathbi{w}'_* = \mathbi{X}^T \mathbi{y} \]
+      \[ \Rightarrow \mathbi{w}'_* = (\mathbi{X}^T \mathbi{X} + \mathbi{M})^{-1} \mathbi{X}^T \mathbi{y} \]
+
+      \item[3.] We know that $\nabla F(\mathbi{w}) = 2 \mathbi{X}^T (\mathbi{X} \mathbi{w} - \mathbi{y}) + 2 \mathbi{M} \mathbi{w}$.
+      Calculating the Hessian $\mathbi{H}_t = \nabla^2 F(\mathbi{w}^{(t)})$:
+      \begin{align*}
+        \nabla F(\mathbi{w}) &= 2 \mathbi{X}^T (\mathbi{X} \mathbi{w} - \mathbi{y}) + 2 \mathbi{M} \mathbi{w} \tag{From part 2} \\
+        \Rightarrow \nabla^2 F(\mathbi{w}) &= 2 \mathbi{X}^T \mathbi{X} + 2 \mathbi{M} \\
+        \Rightarrow \mathbi{H}_t &= 2 \mathbi{X}^T \mathbi{X} + 2 \mathbi{M} \quad \forall t \geq 0
+      \end{align*}
+      We will now simulate a single iteration of Newton's method.
+      Let $\mathbi{w}^{(0)} \in \mathbb{R}^D$ be a random initialization.
+      \begin{align*}
+        \mathbi{w}^{(1)} &= \mathbi{w}^{(0)} - \mathbi{H}^{-1} \nabla F(\mathbi{w}^{(0)}) \\
+        &= \mathbi{w}^{(0)} - (2 \mathbi{X}^T \mathbi{X} + 2 \mathbi{M})^{-1} (2 \mathbi{X}^T (\mathbi{X} \mathbi{w}^{(0)} - \mathbi{y}) + 2 \mathbi{M} \mathbi{w}^{(0)}) \\
+        &= \mathbi{w}^{(0)} - (\mathbi{X}^T \mathbi{X} + \mathbi{M})^{-1} ((\mathbi{X}^T \mathbi{X} + \mathbi{M}) \mathbi{w}^{(0)} - \mathbi{X}^T \mathbi{y}) \\
+        &= \mathbi{w}^{(0)} - \mathbi{w}^{(0)} + (\mathbi{X}^T \mathbi{X} + \mathbi{M})^{-1} \mathbi{X}^T \mathbi{y} \\
+        &= (\mathbi{X}^T \mathbi{X} + \mathbi{M})^{-1} \mathbi{X}^T \mathbi{y} \\
+        &= \mathbi{w}'_*
+      \end{align*}
+      Therefore, $\mathbi{w}^{(1)} = \mathbi{w}'_* ~ \forall \mathbi{w}^{(0)} \in \mathbb{R}^D$ using Newton's method.
+    \end{itemize}
+
+    \item[\textbf{2.2}] Throughout this question, we assume that the data matrix, $\mathbi{X}$, is such that its $n$th row corresponds to $\mathbi{x}_n$ and all vectors are column vectors.
+    The $i$th elements of $\mathbi{x}_n$, $\mathbi{w}$, and $\mathbi{y}$ are denoted by $x_i^{(n)}$, $w_i$, and $y_i$ respectively.
+    \begin{itemize}
+      \item[1.] Assuming $y_1, y_2, \dots, y_N$ are independent, we have the joint density:
+      \[ \mathbb{P}(y_1, y_2, \dots, y_N | \mathbi{x}_1, \mathbi{x}_2, \dots, \mathbi{x}_N; \mathbi{w}, \sigma) = \prod_{n=1}^{N} \mathbb{P}(y_n | \mathbi{x}_n; \mathbi{w}, \sigma) \]
+      The likelihood function for $\mathbi{w}$ is:
+      \begin{align*}
+        \mathcal{L}(\mathbi{w}) &= \mathbb{P}(y_1, y_2, \dots, y_N | \mathbi{x}_1, \mathbi{x}_2, \dots, \mathbi{x}_N; \mathbi{w}, \sigma) \\
+        &= \prod_{n=1}^{N} \mathbb{P}(y_n | \mathbi{x}_n; \mathbi{w}, \sigma) \\
+        \Rightarrow \ln \mathcal{L}(\mathbi{w}) &= \sum_{n=1}^{N} \ln \mathbb{P}(y_n | \mathbi{x}_n; \mathbi{w}, \sigma) \\
+        &= \sum_{n=1}^{N} -\ln(\sigma \sqrt{2\pi}) - \frac{(y_n - \mathbi{w}^T \mathbi{x}_n)^2}{2 \sigma^2} \\
+        &= - \frac{1}{2 \sigma^2} \sum_{n=1}^{N} (y_n - \mathbi{w}^T \mathbi{x}_n)^2 - N \ln(\sigma \sqrt{2\pi})
+      \end{align*}
+      Maximizing the likelihood (or equivalently the log-likelihood):
+      \begin{align*}
+        \nabla \ln \mathcal{L}(\mathbi{w}) &= - \frac{1}{2 \sigma^2} \sum_{n=1}^{N} \nabla (y_n - \mathbi{w}^T \mathbi{x}_n)^2 \\
+        &= - \frac{1}{2 \sigma^2} \sum_{n=1}^{N} -2 (y_n - \mathbi{w}^T \mathbi{x}_n) \mathbi{x}_n \\
+        &= \frac{1}{\sigma^2} \sum_{n=1}^{N} (y_n - \mathbi{w}^T \mathbi{x}_n) \mathbi{x}_n \\
+      \end{align*}
+      \vspace{-\baselineskip}
+      Setting $\nabla \ln \mathcal{L}(\mathbi{w}_*) = 0$ we get:
+      \begin{align*}
+        \nabla \ln \mathcal{L}(\mathbi{w}_*) &= 0 \\
+        \Rightarrow \frac{1}{\sigma^2} \sum_{n=1}^{N} (y_n - \mathbi{w}^T \mathbi{x}_n) \mathbi{x}_n  &= 0 \\
+        \Rightarrow \sum_{n=1}^{N} y_n \mathbi{x}_n &= \sum_{n=1}^{N} (\mathbi{w}^T \mathbi{x}_n) \mathbi{x}_n \\
+        &= \left( \sum_{n=1}^{N} \mathbi{x}_n \mathbi{x}_n^T \right) \mathbi{w} \tag{1} \\
+        &= (\mathbi{X}^T \mathbi{X}) \mathbi{w} \tag{2} \\
+        \Rightarrow \mathbi{w}_* &= (\mathbi{X}^T \mathbi{X})^{-1} \left( \sum_{n=1}^{N} y_n \mathbi{x}_n \right) \\
+        &= (\mathbi{X}^T \mathbi{X})^{-1} \mathbi{X}^T \mathbi{y} \tag{3} \\
+      \end{align*}
+      Proof of (1): \\
+      The $i$th element of $\sum_{n=1}^{N} (\mathbi{w}^T \mathbi{x}_n) \mathbi{x}_n$ is $\sum_{n=1}^{N} \sum_{j=1}^{D} x_i^{(n)} x_j^{(n)} w_j$, where $D$ is the dimension of $\mathbi{w}$ and $\mathbi{x}_n$.
+      Also, the $i$th element of $\left( \sum_{n=1}^{N} \mathbi{x}_n \mathbi{x}_n^T \right) \mathbi{w}$ is $\sum_{j=1}^{D} \sum_{n=1}^{N} x_i^{(n)} x_j^{(n)} w_j$.
+      Hence, $\sum_{n=1}^{N} (\mathbi{w}^T \mathbi{x}_n) \mathbi{x}_n = \left( \sum_{n=1}^{N} \mathbi{x}_n \mathbi{x}_n^T \right) \mathbi{w}$. \\
+      Proof of (2): \\
+      Again, the $(i, j)$th element of both $\sum_{n=1}^{N} \mathbi{x}_n \mathbi{x}_n^T$ and $\mathbi{X}^T \mathbi{X}$ is $\sum_{n=1}^{N} x_i^{(n)} x_j^{(n)}$. \\
+      Proof of (3): \\
+      The $i$th element of $\sum_{n=1}^{N} y_n \mathbi{x}_n$ is $\sum_{n=1}^{N} y_n x_i^{(n)}$, which is also the $i$th element of $\mathbi{X}^T \mathbi{y}$.
+
+      \item[2.] We have seen that the MLE (Maximum Likelihood Estimator) of $\mathbi{w}$ is $\mathbi{w}_* = (\mathbi{X}^T \mathbi{X})^{-1} \mathbi{X}^T \mathbi{y}$ and the log-likelihood function is given by:
+      \begin{align*}
+        \ln \mathcal{L}(\mathbi{w}, \sigma) &= - \frac{1}{2 \sigma^2} \sum_{n=1}^{N} (y_n - \mathbi{w}^T \mathbi{x}_n)^2 - N \ln(\sigma \sqrt{2\pi}) \\
+        &= - \frac{1}{2 \sigma^2} \sum_{n=1}^{N} (y_n - \mathbi{w}_*^T \mathbi{x}_n)^2 - N \ln \sigma - N \ln \sqrt{2\pi} \\
+      \end{align*}
+      We include $\sigma$ in the likelihood function since it is also a parameter now.
+      Maximizing the log-likelihood function with respect to $\sigma$:
+      \[
+        \frac{\partial}{\partial \sigma} \ln \mathcal{L}(\mathbi{w}, \sigma) = \frac{1}{\sigma^3} \sum_{n=1}^{N} (y_n - \mathbi{w}^T \mathbi{x}_n)^2 - \frac{N}{\sigma}
+      \]
+      Setting $\frac{\partial}{\partial \sigma} \ln \mathcal{L}(\mathbi{w}_*, \sigma_*) = 0$, we get:
+      \begin{align*}
+        \frac{\partial}{\partial \sigma} \ln \mathcal{L}(\mathbi{w}_*, \sigma_*) &= 0 \\
+        \Rightarrow \frac{1}{\sigma_*^3} \sum_{n=1}^{N} (y_n - \mathbi{w}_*^T \mathbi{x}_n)^2 - \frac{N}{\sigma_*} &= 0 \\
+        \Rightarrow \sigma_*^2 N &= \sum_{n=1}^{N} (y_n - \mathbi{w}_*^T \mathbi{x}_n)^2 \\
+        &= ||\mathbi{X} \mathbi{w}_* - \mathbi{y}||_2^2 \\
+        \Rightarrow \sigma_* &= \frac{||\mathbi{X} \mathbi{w}_* - \mathbi{y}||_2}{\sqrt{N}} \\
+      \end{align*}
+      which is the standard deviation of the residuals or the root mean square error (can be more easily seen if we expand the norm).
+    \end{itemize}
+  \end{itemize}
+  
+\section{Problem 3}
+  
+  \begin{itemize}
+    \item[1.] The given loss function $F_n(\mathbi{w}) = \left( \max \left\{0, 1 - y_n \mathbi{w}^T \mathbi{x}_n \right\} \right)^2$ can be written as:
+    \[
+      F_w(\mathbi{w}) =
+      \begin{cases}
+         \left( 1 - y_n \mathbi{w}^T \mathbi{x}_n \right)^2 & \text{if } y_n \mathbi{w}^T \mathbi{x}_n < 1 \\
+         0 & \text{otherwise}
+      \end{cases}
+    \]
+    Now, if $y_n \mathbi{w}^T \mathbi{x}_n \ge 1$, then $\nabla F_n(\mathbi{w}) = \mathbi{0}$.
+    Otherwise:
+    \begin{align*}
+      \nabla F_n(\mathbi{w}) &= \nabla \left( 1 - y_n \mathbi{w}^T \mathbi{x}_n \right)^2 \\
+      &= 2 \left( 1 - y_n \mathbi{w}^T \mathbi{x}_n \right) (-y_n \mathbi{x}_n) \\
+      &= -2 y_n (1 - y_n \mathbi{w}^T \mathbi{x}_n) \mathbi{x}_n \\
+    \end{align*}
+    Combining both cases, we have:
+    \[
+      \nabla F_n(\mathbi{w}) = -2 y_n \max\{0, 1 - y_n \mathbi{w}^T \mathbi{x}_n\} \mathbi{x}_n
+    \]
+    For Stochastic Gradient Descent (SGD), define the stochastic gradient $\tilde{\nabla} F(\mathbi{w})$ as:
+    \[
+      \tilde{\nabla} F(\mathbi{w}) = \nabla F_I(\mathbi{w}) = -2 Y \max\{0, 1 - Y \mathbi{w}^T \mathbi{X}\} \mathbi{X}
+    \]
+    where $(\mathbi{X}, Y)$ is a randomly chosen data sample and $I$ is the random index of the sample.
+    Since the training samples are independent and identically distributed (presumably) and $\nabla F(\mathbi{w}) = \frac{1}{N} \sum_{n=1}^{N} \nabla F_n(\mathbi{w})$ by Central Limit Theorem we can conclude that:
+    \[ \mathbb{E}[\tilde{\nabla} F(\mathbi{w})] = \nabla F(\mathbi{w}) \]
+    Hence, the algorithm is (we add the tolerance hyperparameter $\epsilon$ to prevent an infinite loop):
+    \begin{algorithm}
+      \caption{SGD for minimizing $F(\mathbi{w})$}
+      \begin{algorithmic}[1]
+        \State \textbf{Input:} A training set $(\mathbi{x}_1, y_1), \dots, (\mathbi{x}_N, y_N) \in \mathbb{R}^D \times \{-1, 1\}$, learning rate $\eta > 0$, tolerance $\epsilon > 0$
+        \State \textbf{Initialization:} $\mathbi{w} = \mathbi{0}$
+        \State \textbf{Repeat:}
+          \IndentState Randomly pick $i \in \{1, 2, \dots, N\}$
+          \IndentState Compute $\tilde{\nabla} F(\mathbi{w}) = -2 y_i \max\{0, 1 - y_i \mathbi{w}^T \mathbi{x}_i\} \mathbi{x}_i$
+          \IndentState Update $\mathbi{w} \gets \mathbi{w} - \eta \tilde{\nabla} F(\mathbi{w})$
+          \IndentState Break if $||\tilde{\nabla} F(\mathbi{w})||_2 < \epsilon$
+        \State \textbf{Output:} $\mathbi{w}$
+      \end{algorithmic}
+    \end{algorithm}
+
+    \item[2.]
+    \begin{itemize}
+      \item[(a)] We can see that the new loss function $F_n(\mathbi{w})$ is the same as the squared hinge loss, but with diminished penalty for the class -1.
+      This leads to the model prioritizing class +1 samples over class -1.
+      Hence the resulting decision boundary will be near $w_1$, if not $w_1$.
+
+      \item[(b)] We would want to modify the loss function in this way in cases where one class is more important that the other.
+      Consider one of the most popular task of classifying a tumor as malignant (class +1) or benign (class -1).
+      In this case, false negative predictions can be fatal and hence we would want the model to prioritize class +1 samples over class -1.
+
+      \item[(c)] Note that we can cleverly write the new loss function as:
+      \[
+        F_n(\mathbi{w}) = \max\{0.1, y_n\} \cdot \left( \max \left\{0, 1 - y_n \mathbi{w}^T \mathbi{x}_n \right\} \right)^2
+      \]
+      We can do this because:
+      \[
+        \max\{0.1, y_n\} =
+        \begin{cases}
+           1 & \text{if } y_n = 1 \\
+           0.1 & \text{if } y_n = -1
+        \end{cases}
+      \]
+      Also note that $\max\{0.1, y_n\}$ is not dependent on $\mathbi{w}$.
+      Therefore, we have:
+      \begin{align*}
+        \nabla F_n(\mathbi{w}) &= \max\{0.1, y_n\} \cdot \nabla \left( \max \left\{0, 1 - y_n \mathbi{w}^T \mathbi{x}_n \right\} \right)^2 \\
+        &= \max\{0.1, y_n\} \cdot (-2 y_n \max\{0, 1 - y_n \mathbi{w}^T \mathbi{x}_n\} \mathbi{x}_n) \tag{From part 1} \\
+        &= -2 y_n \max\{0.1, y_n\} \max\{0, 1 - y_n \mathbi{w}^T \mathbi{x}_n\} \mathbi{x}_n
+      \end{align*}
+      Like part 1, we define the stochastic gradient $\tilde{\nabla} F(\mathbi{w})$ as:
+      \[
+        \tilde{\nabla} F(\mathbi{w}) = \nabla F_I(\mathbi{w}) = -2 Y \max\{0.1, Y\} \max\{0, 1 - Y \mathbi{w}^T \mathbi{X}\} \mathbi{X}
+      \]
+      and conclude that $\mathbb{E}[\tilde{\nabla} F(\mathbi{w})] = \nabla F(\mathbi{w})$ by Central Limit Theorem, where $(\mathbi{X}, Y)$ is a randomly chosen data sample and $I$ is the random index of the sample.
+      The updated algorithm becomes:
+      \begin{algorithm}
+        \caption{SGD for minimizing modified $F(\mathbi{w})$}
+        \begin{algorithmic}[1]
+          \State \textbf{Input:} A training set $(\mathbi{x}_1, y_1), \dots, (\mathbi{x}_N, y_N) \in \mathbb{R}^D \times \{-1, 1\}$, learning rate $\eta > 0$, tolerance $\epsilon > 0$
+          \State \textbf{Initialization:} $\mathbi{w} = \mathbi{0}$
+          \State \textbf{Repeat:}
+            \IndentState Randomly pick $i \in \{1, 2, \dots, N\}$
+            \IndentState Compute $\tilde{\nabla} F(\mathbi{w}) = -2 y_i \max\{0.1, y_i\} \max\{0, 1 - y_i \mathbi{w}^T \mathbi{x}_i\} \mathbi{x}_i$
+            \IndentState Update $\mathbi{w} \gets \mathbi{w} - \eta \tilde{\nabla} F(\mathbi{w})$
+            \IndentState Break if $||\tilde{\nabla} F(\mathbi{w})||_2 < \epsilon$
+          \State \textbf{Output:} $\mathbi{w}$
+        \end{algorithmic}
+      \end{algorithm}
+    \end{itemize}
+  \end{itemize}
+
+\end{document}
