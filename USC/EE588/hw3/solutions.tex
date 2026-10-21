@@ -1,0 +1,154 @@
+\documentclass{article}
+
+% Margins and spacing
+\usepackage[a4paper, margin=.7in]{geometry}
+% Math packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+% Figures and graphics
+\usepackage{graphicx}
+\usepackage{caption}
+% Placement of figures, tables, algorithms, etc.
+\usepackage{float}
+% Hyperlinks
+\usepackage{hyperref}
+% Reference section names
+\usepackage{nameref}
+% Algorithms
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+%% Tips
+% Fix spacing between lines
+% \vspace{-\baselineskip}
+
+% No section numbering
+\setcounter{secnumdepth}{0}
+% No page numbering
+\pagenumbering{gobble}
+% No paragraph indentation
+\setlength{\parindent}{0pt}
+% Removes caption prefixes (e.g., "Figure 1:") from figures
+% \captionsetup[figure]{labelformat=empty}
+
+% Define custom commands
+%% Underlined hyperlinks
+\newcommand{\uhref}[2]{\href{#1}{\underline{#2}}}
+%% Bold-italic math symbols
+\newcommand{\mathbi}[1]{\boldsymbol{#1}}
+%% Caret symbol
+\newcommand{\caret}{\text{\^{}}}
+%% Operators
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\sgn}{sgn}
+%% Manually indented states in algorithmic environment
+\newcommand{\IndentState}{\State \hspace{1em}}
+\newcommand{\DIndentState}{\State \hspace{2em}}
+
+%% Temp
+\newcommand{\disc}{\text{disc}}
+
+\title{EE588: Homework 3 Solutions}
+\author{
+  Naman Chhibbar \\
+  USC ID: 7709-8548-02
+}
+\date{}
+
+% Document body
+\begin{document}
+\maketitle
+
+\section{Text exercises}
+
+\begin{itemize}
+  \item[4.15] \textit{Relaxation of Boolean LP.} In a \textit{Boolean Linear program}, the variable $x$ is constained to have components equal to zero or one:
+  \begin{align*}
+    \text{minimize} \quad & c^T x \\
+    \text{subject to} \quad & Ax \preceq b \tag{4.67} \\
+    & x_i \in \{0, 1\}, \quad i = 1, \ldots, n.
+  \end{align*}
+  In general, such problems are very difficult to solve, even though the feasible set is finite (containing at most $2^n$ points). \\
+  In a general method called \textit{relaxation}, the constaint that $x_i$, has to be zero or one is replaced with the linear inequalities $0 \le x_i \le 1$:
+  \begin{align*}
+    \text{minimize} \quad & c^T x \\
+    \text{subject to} \quad & Ax \preceq b \tag{4.68} \\
+    & 0 \le x_i \le 1, \quad i = 1, \ldots, n.
+  \end{align*}
+  We refer to this problem as the \textit{LP relaxation} of the Boolean LP (4.67). The LP relaxation is far easier to solve than the original Boolean LP.
+  \begin{itemize}
+    \item[(a)] Show that the optimal value of the LP relaxation (4.68) is a lower bound on the optimal value of the Boolean LP (4.67). What can you say about the Boolean LP if the LP relaxation is infeasible?
+    \item[(b)] It sometimes happens that the LP relaxation has a solution with $x_i \in \{0, 1\}$. What can you say in this case?
+  \end{itemize}
+  \textbf{Solution:}
+
+  \item[4.17] \textit{Optimal activity levels.} We consider the selection of $n$ nonnegative activity levels, denoted $x_1, \ldots, x_n$. These activites consume $m$ resources, which are limited. Activity $j$ consumes $A_{ij}x_j$ of resource $i$, where $A_{ij}$ are given. The total resource consumption is additive, so the total of resource $i$ consumed is $c_i = \sum_{j=1}^n A_{ij} x_j$. (Ordinarily we have $A_{ij} \ge 0$, which means that activity $j$ consumes resource $i$. But we allow the possibility that $A_{ij} < 0$, which means that activity $j$ actually \textit{generates} resource $i$ as a by-product.) Each resource consumption is limited: we must have $c_i \le c_i^{\max}$, where $c_i^{\max}$ are given. Each activity generates revenuem which is a piecewise-linear concave function of the activity level:
+  \[ r_j(x_j) = \begin{cases} p_j x_j & 0 \le x_j \le q_j \\ p_j q_j + p_j^{\disc}(x_j - q_j) & x_j \le q_j \end{cases} \]
+  Here $p_j > 0$ is the basic price, $q_j > 0$ is the quantity discount level, and $p_j^{\disc}$ is the quantity discount price, for (the product of) activity $j$. (We have $0 < p_j{\disc} < p_j$.) The total revenue is the sume of the revenues from associated with each activity, i.e., $\sum_{j=1}^n r_j(x_j)$. The goal is to chose activity levels that maximize the total revenue while respecting the resource limits. Show how to formulate this problem as an LP. \\
+  \textbf{Solution:}
+
+  \item[5.5] \textit{Dual of a general LP.} Find the dual function of the LP
+  \begin{align*}
+    \text{minimize} \quad & c^T x \\
+    \text{subject to} \quad & Gx \preceq h \\
+    & Ax = b.
+  \end{align*}
+  Give the dual problem, and make the implicit equality constraints explicit. \\
+  \textbf{Solution:}
+
+  \item[5.13] \textit{Lagrangian relaxation of Boolean LP.} A \textit{Boolean linear program} is an optimization problem of the form
+  \begin{align*}
+    \text{minimize} \quad & c^T x \\
+    \text{subject to} \quad & Ax \preceq b \\
+    & x_i \in \{0, 1\}, \quad i = 1, \ldots, n,
+  \end{align*}
+  and is, in general, very difficult to solve. In exercise 4.15 we studies the LP relaxation of this problem,
+  \begin{align*}
+    \text{minimize} \quad & c^T x \\
+    \text{subject to} \quad & Ax \preceq b \tag{5.107} \\
+    & 0 \le x_i \le 1, \quad i = 1, \ldots, n,
+  \end{align*}
+  which is far easier to solve, and gives a lower bound on the optimal value of the Boolean LP. In this problem, we derive another lower bound for the Boolean LP, and work out the relation between the two lower bounds.
+  \begin{itemize}
+    \item[(a)] \textit{Lagrangian relaxation.} The Boolean LP can be reformulated as the problem
+    \begin{align*}
+      \text{minimize} \quad & c^T x \\
+      \text{subject to} \quad & Ax \preceq b \\
+      & x_i(1 - x_i) = 0, \quad i = 1, \ldots, n,
+    \end{align*}
+    which has quadratic equality constraints. Find the Langrange dual of this problem. The optimal value of the dual (which is convex) gives a lower bound on the optimal value of the Boolean LP. This method of finding a lower bound on the optimal value is called \textit{Lagrangian relaxation}.
+    \item[(b)] Show that the lower bound obtained via Lagrangian relaxation, and via the LP relaxation (5.107), are the same. \textit{Hint.} Derive the dual of the LP relaxation (5.107). \\
+    \textbf{Solution:}
+  \end{itemize}
+\end{itemize}
+
+\section{Additional exercises}
+
+\begin{itemize}
+  \item[1.] \textit{Reformulating constraints in CVX.} Each of the following CVX code fragments describes a convex constraint on the scalar variables $x$, $y$, and $z$, but violates the CVX rule set, and so is invalid. Briefly explain why each fragmet is invalid. Then, rewrite each one in an equivalent form that conforms to the CVX rule set. In your reformulations, you can use linear equality and inequality constraints, and inequalities constructed using CVX functions. You can also introudce additional variables, or use LMIs/ Be sure to explain (briefly) why your reformulation is equivalent to the original constraint, if it is not obvious. \\
+  Check your reformulations by creating a small problem that includes these contraints, and solving it using CVX. Your test problems doesn't have to be feasible; it's enough to verify that CVX processes your constraints without error. \\
+  \textit{Remark.} This looks like a problem about `how to use CVX software', or `tricks for using CVX'. But it really checks whether you understand the various composition rules, convex analysis, and constraint reformulation rules.
+  \begin{itemize}
+    \item[1.] \texttt{norm([x + 2*y, x - y]) == 0}
+    \item[2.] \texttt{square(square(x + y)) <= x - y}
+    \item[3.] \texttt{1/x + 1/y <= 1; x >= 0; y >= 0}
+    \item[4.] \texttt{norm([max(x, 1), max(y, 2)]) <= 3*x + y}
+    \item[5.] \texttt{x*y >= 1; x>= 0; y >= 0}
+    \item[6.] \texttt{(x + y)\caret{2}/sqrt(y) <= x - y + 5}
+    \item[7.] \texttt{x\caret{3} + y\caret{3} <= 1; x >= 0; y >= 0}
+    \item[8.] \texttt{x + z <= 1 + sqrt(x*y - z\caret{2}); x >= 0; y >= 0}
+  \end{itemize}
+  \textbf{Solution:}
+
+  \item[2.] \textit{Optimal activity levels.} Solve the optimal activity level problem described in exercise 4.17 in \textit{Convex Optimization}, for the instance with problem data
+  \[ A = \begin{bmatrix} 1 & 2 & 0 & 1 \\ 0 & 0 & 3 & 1 \\ 0 & 3 & 1 & 1 \\ 2 & 1 & 2 & 5 \\ 1 & 0 & 3 & 2 \end{bmatrix}, \quad
+  c^{\max} = \begin{bmatrix} 100 \\ 100 \\ 100 \\ 100 \\ 100 \end{bmatrix}, \quad
+  p = \begin{bmatrix} 3 \\ 2 \\ 7 \\ 6 \end{bmatrix}, \quad
+  p^{\disc} = \begin{bmatrix} 2 \\ 1 \\ 4 \\ 2 \end{bmatrix}, \quad
+  q = \begin{bmatrix} 4 \\ 10 \\ 5 \\ 10 \end{bmatrix} \]
+  You can do this by forming the LP you found in your solution of exercise 4.17, or more directly, using CVX. Give the optimal activity levels, the revenue generated by each one, and the total revenue generated by the optimal solution. Also, give the average price per unit for each actvity level, i.e., the ratio of the revenue associated with an acitivity, to the acitivity level. (These numbers should be between the basic and discounted prices for each activity.) Give a \textit{very brief} story explaining, or at least commenting on, the solution you find. \\
+  \textbf{Solution:}
+\end{itemize}
+
+\end{document}
