@@ -116,7 +116,24 @@
     & Ax = b.
   \end{align*}
   Give the dual problem, and make the implicit equality constraints explicit. \\
-  \textbf{Solution:}
+  \textbf{Solution:} Let $\lambda \preceq 0$ and $\nu$ be the dual vectors. The Lagrangian will be:
+  \begin{align*}
+    L(x, \lambda, \nu) &= c^T x + \lambda^T (Gx - h) + \nu^T (Ax - b) \\
+    &= (c + G^T \lambda + A^T \nu)^T x - h^T \lambda - b^T \nu
+  \end{align*}
+  The Lagrange dual function will be:
+  \[ g(\lambda, \nu) = \inf_x L(x, \lambda, \nu) = \inf_x \left( (c + G^T \lambda + A^T \nu)^T x - h^T \lambda - b^T \nu \right) \]
+  The dual problem will be:
+  \begin{align*}
+    \text{maximize} \quad & g(\lambda, \nu) \\
+    \text{subject to} \quad & \lambda \preceq 0
+  \end{align*}
+  After making the implicit dual constrain $c + G^T \lambda + A^T \nu = 0$ explicit, we get:
+   \begin{align*}
+    \text{maximize} \quad & -h^T \lambda - b^T \nu \\
+    \text{subject to} \quad & \lambda \preceq 0 \\
+    & c + G^T \lambda + A^T \nu = 0
+  \end{align*}
 
   \item[5.13] \textit{Lagrangian relaxation of Boolean LP.} A \textit{Boolean linear program} is an optimization problem of the form
   \begin{align*}
