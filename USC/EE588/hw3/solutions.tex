@@ -91,7 +91,7 @@
   \end{itemize}
 
   \item[4.17] \textit{Optimal activity levels.} We consider the selection of $n$ nonnegative activity levels, denoted $x_1, \ldots, x_n$. These activites consume $m$ resources, which are limited. Activity $j$ consumes $A_{ij}x_j$ of resource $i$, where $A_{ij}$ are given. The total resource consumption is additive, so the total of resource $i$ consumed is $c_i = \sum_{j=1}^n A_{ij} x_j$. (Ordinarily we have $A_{ij} \ge 0$, which means that activity $j$ consumes resource $i$. But we allow the possibility that $A_{ij} < 0$, which means that activity $j$ actually \textit{generates} resource $i$ as a by-product.) Each resource consumption is limited: we must have $c_i \le c_i^{\max}$, where $c_i^{\max}$ are given. Each activity generates revenuem which is a piecewise-linear concave function of the activity level:
-  \[ r_j(x_j) = \begin{cases} p_j x_j & 0 \le x_j \le q_j \\ p_j q_j + p_j^{\disc}(x_j - q_j) & x_j \le q_j \end{cases} \]
+  \[ r_j(x_j) = \begin{cases} p_j x_j & 0 \le x_j \le q_j \\ p_j q_j + p_j^{\disc}(x_j - q_j) & x_j \ge q_j \end{cases} \]
   Here $p_j > 0$ is the basic price, $q_j > 0$ is the quantity discount level, and $p_j^{\disc}$ is the quantity discount price, for (the product of) activity $j$. (We have $0 < p_j{\disc} < p_j$.) The total revenue is the sume of the revenues from associated with each activity, i.e., $\sum_{j=1}^n r_j(x_j)$. The goal is to chose activity levels that maximize the total revenue while respecting the resource limits. Show how to formulate this problem as an LP. \\
   \textbf{Solution:}
 
