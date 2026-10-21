@@ -82,6 +82,13 @@
     \item[(b)] It sometimes happens that the LP relaxation has a solution with $x_i \in \{0, 1\}$. What can you say in this case?
   \end{itemize}
   \textbf{Solution:}
+  \begin{itemize}
+    \item[(a)] Let $F_{\text{bool}}$ and $F_{\text{rel}}$ be the feasible sets of the Boolean LP and its LP relaxation, respectively. Now, since $\{0, 1\} \subset [0, 1]$, every point in $F_{\text{bool}}$ is also in $F_{\text{rel}}$, i.e., $F_{\text{bool}} \subseteq F_{\text{rel}}$. Since the optimal value of any minimization problem is the infimum of the objective function over the feasible set, we conclude that $p^*_{\text{bool}} \ge p^*_{\text{rel}}$, where $p^*_{\text{bool}}$ and $p^*_{\text{rel}}$ are the optimal values of the Boolean LP and its LP relaxation, respectively. \\
+    If the LP relaxation is infeasible, it would mean that $F_{\text{rel}} = \emptyset$. Since $F_{\text{bool}} \subseteq F_{\text{rel}}$, we would also have $F_{\text{bool}} = \emptyset$, i.e., the Boolean LP is also infeasible.
+    \item[(b)] Suppose $x^*_{\text{rel}}$ be an optimal solution to the LP relaxation such that $(x^*_{\text{rel}})_i \in \{0, 1\}$, i.e., $x^*_{\text{rel}} \in F_{\text{bool}}$. If $p^*_{\text{bool}}$ is the optimal value of the Boolean LP, then
+    \[ p^*_{\text{bool}} \le c^T x^*_{\text{rel}} \]
+    But, from part (a), we know that $p^*_{\text{bool}} \ge p^*_{\text{rel}} = c^T x^*_{\text{rel}}$. Hence, we get $p^*_{\text{bool}} = c^T x^*_{\text{rel}}$. Therefore, $x^*_{\text{rel}}$ is an optimal solution to the Boolean LP.
+  \end{itemize}
 
   \item[4.17] \textit{Optimal activity levels.} We consider the selection of $n$ nonnegative activity levels, denoted $x_1, \ldots, x_n$. These activites consume $m$ resources, which are limited. Activity $j$ consumes $A_{ij}x_j$ of resource $i$, where $A_{ij}$ are given. The total resource consumption is additive, so the total of resource $i$ consumed is $c_i = \sum_{j=1}^n A_{ij} x_j$. (Ordinarily we have $A_{ij} \ge 0$, which means that activity $j$ consumes resource $i$. But we allow the possibility that $A_{ij} < 0$, which means that activity $j$ actually \textit{generates} resource $i$ as a by-product.) Each resource consumption is limited: we must have $c_i \le c_i^{\max}$, where $c_i^{\max}$ are given. Each activity generates revenuem which is a piecewise-linear concave function of the activity level:
   \[ r_j(x_j) = \begin{cases} p_j x_j & 0 \le x_j \le q_j \\ p_j q_j + p_j^{\disc}(x_j - q_j) & x_j \le q_j \end{cases} \]
