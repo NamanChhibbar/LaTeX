@@ -234,16 +234,60 @@
   Check your reformulations by creating a small problem that includes these contraints, and solving it using CVX. Your test problems doesn't have to be feasible; it's enough to verify that CVX processes your constraints without error. \\
   \textit{Remark.} This looks like a problem about `how to use CVX software', or `tricks for using CVX'. But it really checks whether you understand the various composition rules, convex analysis, and constraint reformulation rules.
   \begin{itemize}
-    \item[1.] \texttt{norm([x + 2*y, x - y]) == 0}
-    \item[2.] \texttt{square(square(x + y)) <= x - y}
-    \item[3.] \texttt{1/x + 1/y <= 1; x >= 0; y >= 0}
-    \item[4.] \texttt{norm([max(x, 1), max(y, 2)]) <= 3*x + y}
-    \item[5.] \texttt{x*y >= 1; x>= 0; y >= 0}
-    \item[6.] \texttt{(x + y)\caret{2}/sqrt(y) <= x - y + 5}
-    \item[7.] \texttt{x\caret{3} + y\caret{3} <= 1; x >= 0; y >= 0}
-    \item[8.] \texttt{x + z <= 1 + sqrt(x*y - z\caret{2}); x >= 0; y >= 0}
+    \item[1.] $\mathtt{norm([x + 2*y, x - y]) == 0}$
+    \item[2.] $\mathtt{square(square(x + y)) <= x - y}$
+    \item[3.] $\mathtt{1/x + 1/y <= 1; x >= 0; y >= 0}$
+    \item[4.] $\mathtt{norm([\max(x, 1), \max(y, 2)]) <= 3*x + y}$
+    \item[5.] $\mathtt{x*y >= 1; x>= 0; y >= 0}$
+    \item[6.] $\mathtt{(x + y)\caret{2}/sqrt(y) <= x - y + 5}$
+    \item[7.] $\mathtt{x\caret{3} + y\caret{3} <= 1; x >= 0; y >= 0}$
+    \item[8.] $\mathtt{x + z <= 1 + sqrt(x*y - z\caret{2}); x >= 0; y >= 0}$
   \end{itemize}
   \textbf{Solution:}
+  \begin{itemize}
+    \item[1.] This snippet violates the CVX rule set since an equality constraint (\texttt{==}) require both sides to be affine, whereas \texttt{norm} is not an affine. \\
+    Since the constraint equals to zero, we can easily reformulate the snippet so that the vector elements are zero, which are affine:
+    \begin{align*}
+      \mathtt{x + 2*y == 0} \\
+      \mathtt{x - y == 0}
+    \end{align*}
+    \item[2.] This violates DCP since in a composition $f(g(\ldots))$ with $f$ and $g$ convex, $f$ must be non-decreasing (under DCP rules). Since the outer function $f$ is also a $\mathtt{square}(u)$ function, CVX rejects it since it is only monotonic if $u \ge 0$. \\
+    We can fix the same by introducing a new auxillary variable $t$ as follows: 
+    \begin{align*}
+      \mathtt{variable \quad t} \\
+      \mathtt{square(x + y) <= t} \\
+      \mathtt{square(t) <= x - y}
+    \end{align*}
+    This works since optimization would pull $t$ as close to $\mathtt{square}(x+y)$ as possible. It would do the same for $\mathtt{square}(t)$ by getting close to $x - y$. Essentially, we are getting $\mathtt{square(square(x + y)) <= x - y}$.
+    \item[3.] This is disallowed since DCP rules disallow variables in dominator of ``$\mathtt{/}$''. Instead, we should use the built-in function $\mathtt{inv\_pos}$ to invert. The reformulation looks like:
+    \[ \mathtt{inv\_pos(x) + inv\_pos(y) <= 1} \]
+    with the other two constraints same.
+    \item[4.] DCP rules require $\mathtt{norm}$ to have affine arguments. Here, $\max$ is a non-affine operation. We can replace it by two auxillary variables as:
+    \begin{align*}
+      \text{variables} \quad & u ~ v \\
+      u >= x \\
+      u >= 1 \\
+      v >= y \\
+      v >= 2
+    \end{align*}
+    Since $u \ge x$ and $u \ge 1$, we can confirm that optimization would pull $u$ to be $\max(x, 1)$, and the same with $v$.
+    \item[5.] CVX requires the left-side of $\mathtt{>=}$ to be concave, whereas $\mathtt{x*y}$ is neither concave or convex. Valid reformulation would be:
+    \[ \mathtt{inv\_pos(x) <= y} \]
+    \item[6.] CVX does not allow dividing by a variable square root like $\mathtt{sqrt(y)}$. Instead, we introduce a new auxillary variable $t$ to be the square root of $y$ as follows:
+    \begin{align*}
+      \mathtt{variable \quad t} \\
+      \mathtt{quad\_over\_lin(x + y, t) <= x - y + 5} \tag{1} \\
+      \mathtt{square(t) <= y} \\
+      t >= 0
+    \end{align*}
+    Since, $t$ is in the denominator in (1), and the fact that $t$ is allowed to increase to $\sqrt{y}$, makes up for the fact that optimization would pull $t$ to be $\sqrt{y}$. Hence, this reformulation is equivalent to the original problem. 
+    \item[7.] CVX disallows the use of explicit power operator $\caret$ on decision variables since it is not convex on all of $\mathbb{R}$. Instead, we should use $\mathtt{pow\_pos}$ whenever decision variables are non-negative, as follows:
+    \[ \mathtt{pow\_pos(x, 3) + pow\_pos(y, 3) <= 1} \]
+    with the rest of the constraints as is.
+    \item[8.] The snippet violates CVX rules since the right of $\mathtt{<=}$ contains a $\mathtt{sqrt}$ with an argument that is not concave ($x*y - z\caret2$), which is now allowed. We can instead use the built-in function:
+    \[ \mathtt{det\_rootn(x, z; z, y)} = \sqrt{x*y - z^2} \]
+    that achieves the same goal.
+  \end{itemize}
 
   \item[2.] \textit{Optimal activity levels.} Solve the optimal activity level problem described in exercise 4.17 in \textit{Convex Optimization}, for the instance with problem data
   \[ A = \begin{bmatrix} 1 & 2 & 0 & 1 \\ 0 & 0 & 3 & 1 \\ 0 & 3 & 1 & 1 \\ 2 & 1 & 2 & 5 \\ 1 & 0 & 3 & 2 \end{bmatrix}, \quad
@@ -251,7 +295,6 @@
   p = \begin{bmatrix} 3 \\ 2 \\ 7 \\ 6 \end{bmatrix}, \quad
   p^\disc = \begin{bmatrix} 2 \\ 1 \\ 4 \\ 2 \end{bmatrix}, \quad
   q = \begin{bmatrix} 4 \\ 10 \\ 5 \\ 10 \end{bmatrix} \]
-  You can do this by forming the LP you found in your solution of exercise 4.17, or more directly, using CVX. Give the optimal activity levels, the revenue generated by each one, and the total revenue generated by the optimal solution. Also, give the average price per unit for each actvity level, i.e., the ratio of the revenue associated with an acitivity, to the acitivity level. (These numbers should be between the basic and discounted prices for each activity.) Give a \textit{very brief} story explaining, or at least commenting on, the solution you find. \\
   \textbf{Solution:} Here is the Python code used to calculate the output:
   \begin{lstlisting}
     import cvxpy as cp
