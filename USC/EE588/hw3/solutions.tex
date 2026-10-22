@@ -17,6 +17,9 @@
 % Algorithms
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+% Sus
+\usepackage{listings}
+\usepackage{xcolor}
 
 %% Tips
 % Fix spacing between lines
@@ -49,6 +52,24 @@
 %% Temp
 \newcommand{\disc}{\text{disc}}
 \newcommand{\base}{\text{base}}
+
+% Custom style for Python formatting
+\lstset{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{purple},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=1,
+  numbersep=10pt,
+  backgroundcolor=\color{white},
+  tabsize=4,
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=true
+}
 
 \title{EE588: Homework 3 Solutions}
 \author{
@@ -158,6 +179,51 @@
     which has quadratic equality constraints. Find the Langrange dual of this problem. The optimal value of the dual (which is convex) gives a lower bound on the optimal value of the Boolean LP. This method of finding a lower bound on the optimal value is called \textit{Lagrangian relaxation}.
     \item[(b)] Show that the lower bound obtained via Lagrangian relaxation, and via the LP relaxation (5.107), are the same. \textit{Hint.} Derive the dual of the LP relaxation (5.107). \\
     \textbf{Solution:}
+    \begin{itemize}
+      \item[(a)] With the dual variables $\lambda \succeq 0$ and $\nu$, we have the Lagrangian:
+      \begin{align*}
+        L(x, \lambda, \nu) &= c^T x + \lambda^T(Ax - b) + \sum_{i=1}^n \nu_i (x_i^2 - x_i) \\
+        &= \sum_{i=1}^n \left( \nu_i x_i^2 + (c_i + (A^T \lambda)_i - \nu_i) x_i \right) - b^T \lambda
+      \end{align*}
+      The dual function is $g(\lambda, \nu) = \inf_x L(x, \lambda, \nu)$. We minimize over each $x_i$ independently:
+      \begin{itemize}
+        \item[1.] Case 1 $\nu_i < 0$: If a $\nu_i < 0$, there is a downwards parabola for an $i$ and $L \to -\infty$.
+        \item[2.] Case 2 $\nu_i = 0$: $L$ is linear in $x_i$. The infimum is finite (and equals $0$) if and only if $c_i + (A^T \lambda)_i = 0$.
+        \item[3.] Case 3 $\nu_i > 0$: $L$ is a strictly convex quadratic in $x_i$. Setting $\frac{\partial L}{\partial x_i} = 2\nu_i x_i + c_i + (A^T \lambda)_i - \nu_i = 0$ yields the minimizer:
+        \[ x_i^* = \frac{\nu_i - c_i - (A^T \lambda)_i}{2\nu_i} \]
+        Substituting $x_i^*$ back into $L$ gives the minimal value for component $i$:
+        \[ -\frac{(c_i + (A^T \lambda)_i - \nu_i)^2}{4\nu_i} \]
+        Thus, the Lagrange dual function is:
+        \[ g(\lambda, \nu) = \begin{cases} -b^T \lambda - \displaystyle\frac{1}{4} \sum_{i=1}^n \frac{(c_i + (A^T \lambda)_i - \nu_i)^2}{\nu_i} & \text{if } \lambda \succeq 0, \, \nu \succeq 0 \\ -\infty & \text{otherwise} \end{cases} \]
+        The optimal value of this convex optimization problem gives a lower bound on the Boolean LP.
+      \end{itemize}
+      \item[(b)] The LP relaxation is:
+      \[ \begin{aligned} \text{minimize} \quad & c^T x \\ \text{subject to} \quad & Ax \preceq b \\ & -x \preceq 0 \\ & x \preceq 1 \end{aligned} \]
+      Assign dual variables $u \succeq 0$ to $Ax \preceq b$, $v \succeq 0$ to $-x \preceq 0$, and $w \succeq 0$ to $x \preceq 1$. The Lagrangian for the LP relaxation will be:
+      \begin{align*}
+        L(x, u, v, w) &= c^T x + u^T(Ax - b) - v^T x + w^T(x - 1) \\
+        &= (c + A^T u - v + w)^T x - b^T u - 1^T w
+      \end{align*}
+      Taking the infimum over $x$ yields the dual problem of the LP relaxation:
+      \[ \begin{aligned} \text{maximize} \quad & -b^T u - 1^T w \\ \text{subject to} \quad & A^T u - v + w + c = 0 \\ & u \succeq 0, \quad v \succeq 0, \quad w \succeq 0 \end{aligned} \]
+      From $A^T u - v + w + c = 0$, we have $w_i - v_i = -c_i - (A^T u)_i$.
+      For a fixed $u$, we minimize $1^T w = \sum_{i=1}^n w_i$ over $v_i \ge 0, w_i \ge 0$:
+      \begin{itemize}
+        \item If $c_i + (A^T u)_i \ge 0$, setting $w_i = 0$ and $v_i = c_i + (A^T u)_i$ achieves the lower bound $w_i = 0$.
+        \item If $c_i + (A^T u)_i < 0$, setting $w_i = -(c_i + (A^T u)_i)$ and $v_i = 0$ achieves $w_i = -(c_i + (A^T u)_i)$.
+      \end{itemize}
+      Thus, the optimal choice of $w_i$ is $\max(0, -(c_i + (A^T \lambda)_i))$.
+      The maximized objective value of the LP dual w.r.t. $(v, w)$ is:
+      \[ \phi(\lambda) = -b^T \lambda + \sum_{i=1}^n \min\left(0, \, c_i + (A^T \lambda)_i\right) \]
+      Now consider the Lagrangian dual objective from part (a) for a fixed $\lambda$. We maximize over $\nu_i \ge 0$:
+      \[ h(\nu_i) = -\frac{(a_i - \nu_i)^2}{4\nu_i}, \qquad \text{where } a_i = c_i + (A^T \lambda)_i \]
+      Differentiating $h(\nu_i)$ with respect to $\nu_i \ge 0$ gives the optimal choice $\nu_i^* = \vert{}a_i\vert{} = \vert{}c_i + (A^T \lambda)_i\vert{}$:
+      \begin{itemize}
+        \item If $a_i \ge 0$, then $\nu_i^* = a_i \implies h(\nu_i^*) = 0$.
+        \item If $a_i < 0$, then $\nu_i^* = -a_i \implies h(\nu_i^*) = a_i$.
+      \end{itemize}
+      In both cases, $\max_{\nu_i \ge 0} h(\nu_i) = \min(0, a_i) = \min(0, c_i + (A^T \lambda)_i)$. Hence, maximizing over the dual variables leads to the exact same reduced objective function $\phi(\lambda)$ in both cases.
+    \end{itemize}
   \end{itemize}
 \end{itemize}
 
@@ -186,7 +252,44 @@
   p^\disc = \begin{bmatrix} 2 \\ 1 \\ 4 \\ 2 \end{bmatrix}, \quad
   q = \begin{bmatrix} 4 \\ 10 \\ 5 \\ 10 \end{bmatrix} \]
   You can do this by forming the LP you found in your solution of exercise 4.17, or more directly, using CVX. Give the optimal activity levels, the revenue generated by each one, and the total revenue generated by the optimal solution. Also, give the average price per unit for each actvity level, i.e., the ratio of the revenue associated with an acitivity, to the acitivity level. (These numbers should be between the basic and discounted prices for each activity.) Give a \textit{very brief} story explaining, or at least commenting on, the solution you find. \\
-  \textbf{Solution:}
+  \textbf{Solution:} Here is the Python code used to calculate the output:
+  \begin{lstlisting}
+    import cvxpy as cp
+    import numpy as np
+    # Data
+    A = np.array([
+        [1, 2, 0, 1],
+        [0, 0, 3, 1],
+        [0, 3, 1, 1],
+        [2, 1, 2, 5],
+        [1, 0, 3, 2]
+    ], dtype=float)
+    c_max = np.array([100, 100, 100, 100, 100], dtype=float)
+    p = np.array([3, 2, 7, 6], dtype=float)
+    p_disc = np.array([2, 1, 4, 2], dtype=float)
+    q = np.array([4, 10, 5, 10], dtype=float)
+    # Decision variable: activity levels (x >= 0)
+    x = cp.Variable(4, nonneg=True)
+    # Elementwise concave revenue function: r_j = min(p_j*x_j, p_j*q_j + p_disc_j*(x_j - q_j))
+    r = cp.minimum(cp.multiply(p, x), cp.multiply(p, q) + cp.multiply(p_disc, x - q))
+    # Define and solve problem
+    problem = cp.Problem(cp.Maximize(cp.sum(r)), [A @ x <= c_max])
+    problem.solve()
+    # Results
+    x_opt = x.value
+    r_opt = r.value
+    avg_price = r_opt / x_opt
+    print(f"Optimal activity levels (x): {np.round(x_opt, 4)}")
+    print(f"Revenue per activity (r): {np.round(r_opt, 4)}")
+    print(f"Average price per unit: {np.round(avg_price, 4)}")
+    print(f"Total revenue: ${problem.value:.2f}")
+  \end{lstlisting}
+  And, here is the output and answer to the problem: \\
+  \phantom{} \\
+  Optimal activity levels (x): [ 4.  22.5 31.   1.5] \\
+  Revenue per activity (r): [ 12.   32.5 139.    9. ] \\
+  Average price per unit: [3.     1.4444 4.4839 6.    ] \\
+  Total revenue: \$192.50
 \end{itemize}
 
 \end{document}
