@@ -17,6 +17,10 @@
 % Algorithms
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+% Include source code
+\usepackage{listings}
+% Control colors
+\usepackage{xcolor}
 
 %% Tips
 % Fix spacing between lines
@@ -39,9 +43,29 @@
 %% Operators
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\sgn}{sgn}
+\newcommand{\1}{\mathbf{1}}
 %% Manually indented states in algorithmic environment
 \newcommand{\IndentState}{\State \hspace{1em}}
 \newcommand{\DIndentState}{\State \hspace{2em}}
+
+% Custom style for Python formatting
+\lstset{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{purple},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=1,
+  numbersep=10pt,
+  backgroundcolor=\color{white},
+  tabsize=4,
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=true
+}
 
 \title{}
 \author{}
