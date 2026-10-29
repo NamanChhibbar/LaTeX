@@ -1,0 +1,215 @@
+\documentclass{article}
+
+% Margins and spacing
+\usepackage[a4paper, margin=.7in]{geometry}
+% Math packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+% Figures and graphics
+\usepackage{graphicx}
+\usepackage{caption}
+% Placement of figures, tables, algorithms, etc.
+\usepackage{float}
+% Hyperlinks
+\usepackage{hyperref}
+% Reference section names
+\usepackage{nameref}
+% Algorithms
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+% Sus
+\usepackage{listings}
+\usepackage{xcolor}
+
+%% Tips
+% Fix spacing between lines
+% \vspace{-\baselineskip}
+
+% No section numbering
+\setcounter{secnumdepth}{0}
+% No page numbering
+\pagenumbering{gobble}
+% No paragraph indentation
+\setlength{\parindent}{0pt}
+% Removes caption prefixes (e.g., "Figure 1:") from figures
+% \captionsetup[figure]{labelformat=empty}
+
+% Define custom commands
+%% Underlined hyperlinks
+\newcommand{\uhref}[2]{\href{#1}{\underline{#2}}}
+%% Bold-italic math symbols
+\newcommand{\mathbi}[1]{\boldsymbol{#1}}
+%% Caret symbol
+\newcommand{\caret}{\text{\^{}}}
+%% Operators
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\sgn}{sgn}
+\newcommand{\1}{\mathbf{1}}
+%% Manually indented states in algorithmic environment
+\newcommand{\IndentState}{\State \hspace{1em}}
+\newcommand{\DIndentState}{\State \hspace{2em}}
+
+
+% Custom style for Python formatting
+\lstset{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{purple},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=1,
+  numbersep=10pt,
+  backgroundcolor=\color{white},
+  tabsize=4,
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=true
+}
+
+\title{EE588: Homework 4 Solutions}
+\author{
+  Naman Chhibbar \\
+  USC ID: 7709-8548-02
+}
+\date{}
+
+% Document body
+\begin{document}
+\maketitle
+
+\section{Text exercises}
+
+\begin{itemize}
+  \item[6.2] Let $f(x)$ be the objective to minimize in each case.
+  \begin{itemize}
+    \item[$\ell_1$-norm]
+    \begin{align*}
+      f(x) &= \|x \1 - b\|_1 \\
+      &= \sum_{i=1}^n |x - b_i|
+    \end{align*}
+    Where $n$ the dimension of the vector space and $b_i$ is the $i$th element of $b$. Taking the derivative (assuming $x \notin \{b_1, \dots, b_n\}$):
+    \[ f'(x) = \sum_{i=1}^n \sgn(x - b_i) \]
+    Here, $\sgn$ is defined as follows:
+    \[ \sgn(u) = \begin{cases} 1 & u > 0 \\ -1 & u < 0 \end{cases} \]
+    We can see that $f'(x)$ is minimized when the numbers of -1s and 1s are close to each other (note that we can analyze the gradient of $f$ even though it is not defined for $x \in \{b_1, \dots, b_n\}$ is because f will locally be a linear function in $x$). \\
+    This will be achieved at the median of the set $\{b_1, b_2, \dots, b_n\}$, since then $x$ will have (almost) equal number of $b_i$s on either side (in case $n$ is even, $x$ can be any value inclusively between the two medians). \\
+    Hence, $x^* = \text{median}\{b_1, b_2, \dots, b_n\}$.
+    \item[$\ell_2$-norm]
+    \begin{align*}
+      f(x) &= \|x \1 - b\|_2 \\
+      &= \sqrt{\sum_{i=1}^n (x - b_i)^2}
+    \end{align*}
+    Since $f(x)$ is non-negative, minimizing $f(x)$ is equivalent to minimizing its square. Let $g$ be its square.
+    \begin{align*}
+      g(x) &= f(x)^2 \\
+      &= \sum_{i=1}^n (x - b_i)^2 \\
+      \Rightarrow g'(x) &= 2 \cdot \sum_{i=1}^n (x - b_i) \\
+      &= 2n x - 2 \cdot \sum_{i=1}^n b_i
+    \end{align*}
+    Setting the dervitive to 0:
+    \begin{align*}
+      2n x^* - 2 \cdot \sum_{i=1}^n b_i &= 0 \\
+      \Rightarrow n x^* &= \sum_{i=1}^n b_i \\
+      \Rightarrow x^* &= \frac{\sum_{i=1}^n b_i}{n}
+    \end{align*}
+    \item[$\ell_\infty$-norm]
+    \begin{align*}
+      f(x) &= \|x \1 - b\|_\infty \\
+      &= \max_{i \in \{1, \dots, n\}} |x - b_i|
+    \end{align*}
+    Notice that the maximum distance will always be from a point on the extremity, i.e. either from the minimum or maximum of $b_i$s. Let $b_{\min} = \min \{b_1, \dots, b_n\}$ and $b_{\max} = \max \{b_1, \dots, b_n\}$, then:
+    \[ f(x) = \max \{b_{\max} - x, x - b_{\min}\} \]
+    Both distances are minimized at the center, therefore
+    \[ x^* = \frac{b_{\min} + b_{\max}}{2} \]
+  \end{itemize}
+
+  \item[6.10] Our objective will be to minimize:
+  \begin{align*}
+    &\sum_{i=1}^N (f(x_i) - y_i)^2 \\
+    \Rightarrow &\sum_{i=1}^N (1/2) x_i^T P x_i + q^T x_i + r - y_i \tag{1}
+  \end{align*}
+  Each term in expression (1) is a squared affine function in $P, q, r$. Hence, the overall objective is a convex quadratic in $P, q, r$. \\
+  For $f$ to be concave on $\mathcal{B}$, we must have the Hessian to be negative semidefeinite.
+  \begin{align*}
+    \nabla^2 f(x) &= P \\
+    \Rightarrow P &\preceq 0 \tag{2}
+  \end{align*}
+  For $f$ to be non-decreasing, we must have the gradient non-negative on $\mathcal{B}$
+  \begin{align*}
+    \nabla f(x) &= P x + q \quad \forall x \in \mathcal{B} \\
+    \Rightarrow P x + q &\succeq 0 \quad \forall x \in \mathcal{B}
+  \end{align*}
+  Or, in other words, for each $k \in \{1, \dots, n\}$ we must have $(P x + q)^{(k)} \ge 0$, where $v^{(k)}$ denotes the $k$th element of vector $v$. \\
+  If $P_{kj}$ denotes the element at row $k$ and column $j$ of $P$, the minimum value of $(P x + q)^{(k)}$ on $x \in \mathcal{B}$ will be attained by setting:
+  \[ x^{(j)} = \begin{cases} l^{(j)} & P_{kj} \ge 0 \\ u^{(j)} & \text{otherwise} \end{cases} \]
+  Hence, we need $\sum_{j=1}^n P_{kj} x^{(j)} + q^{(j)} \ge 0$, with $x^{(j)}$ defined as above. To simplify this, we can split $P$ in two matrices as follows:
+  \[ P = P^+ + P^- \]
+  where $P^+$ and $P^-$ are defined as follows:
+  \begin{align*}
+    {P^+}_{kj} &= \begin{cases} P_{kj} & P_{kj} \ge 0 \\ 0 & \text{otherwise} \end{cases} \\
+    {P^-}_{kj} &= \begin{cases} P_{kj} & P_{kj} < 0 \\ 0 & \text{otherwise} \end{cases}
+  \end{align*}
+  That is, $P^+$ and $P^-$ capture the non-negative and negative elements of $P$ respectively. Therefore, the constraint becomes:
+  \[ P^+ l + P^- u + q \succeq 0 \tag{3} \]
+  Now, since $f$ is non-decreasing, its minimum value will be attained at $x = l$. For $f$ to be non-negative, we must have:
+  \begin{align*}
+    f(l) &\ge 0 \\
+    \Rightarrow (1/2) l^T P l + q^T l + r &\ge 0 \tag{4}
+  \end{align*}
+  Hence the quadratic curve fitting problem with mean squared error and the given constraints is equivalent to the convex problem with the objective given by (1) and constraints given by (2), (3), and (4).
+
+  \item[7.1] We have the linear measurement model $y = A x + v$ with $v_i$ being i.i.d. $\text{Exponential}(a)$ with $a > 0$
+  \[ p(z) = \begin{cases} (1/a) e^{-z/a} & z \ge 0 \\ 0 & z < 0 \end{cases} \]
+  Here, we have $v = y - A x$, hence we must have $y \succeq A x$. The log likelihood of $y$ given feasible data $x$ is:
+  \begin{align*}
+    \log p(y | x) &= \log \left(\prod_{i=1}^n p(y_i | x)\right) \\
+    &= \sum_{i=1}^n \log p(y_i | x) \\
+    &= \sum_{i=1}^n \log\left((1/a) e^{-(y_i - a_i^T x)}\right) \tag{$v = y - A x$} \\
+    &= -m \log a - \sum_{i=1}^n (y_i - a_i^T x) \\
+    &= -m \log a - \1^T y + \1^T A x
+  \end{align*}
+  Thus, maximizing the likelihood is equivalent to maximizing $\1^T A x$ (since $y$ is a known constant). Hence, the ML estimation problem is the linear program
+  \begin{align*}
+    \text{Maximize} \quad &\1^T A x \\
+    \text{Subject to} \quad &A x \preceq y
+  \end{align*}
+\end{itemize}
+
+\section{Additional exercises}
+
+\begin{itemize}
+  \item \texttt{tv\_img\_interp.m} attached to submission with solution code filled and placeholder commented out.
+
+  \item
+  \begin{itemize}
+    \item[1.] We can solve this by formulating a quadratic program with the censored data, $y^{(M+1)}, \dots, y^{(K)}$, as our decision variables along with $c$ and $J$ as the objective:
+    \begin{align*}
+      \text{Minimize} \quad &J = \sum_{k=1}^K \left(y^{(k)} - c^T x^{(k)}\right)^2 \\
+      \text{Subject to} \quad &y^{(k)} \ge D \quad \forall k \in \{M + 1, \dots, K\}
+    \end{align*}
+    For $k \in \{M + 1, \dots, K\}$, if $c^T x^{(k)} \ge D$ then we will have ${y^{(k)}}^* = c^T x^{(k)}$, the optimal value of ${y^{(k)}}^*$. Otherwise, the optimal value would be restricted to ${y^{(k)}}^* = D$. Hence, ${y^{(k)}}^* = \max\{D, c^T x^{(k)}\}$, and we get an unconstrained quadratic program to minimize
+    \begin{align*}
+      J &= \sum_{k=1}^M \left(y^{(k)} - c^T x^{(k)}\right)^2 + \sum_{k=M+1}^K \left(\max\{D, c^T x^{(k)}\} - c^T x^{(k)}\right)^2 \\
+      &= \sum_{k=1}^M \left(y^{(k)} - c^T x^{(k)}\right)^2 + \sum_{k=M+1}^K \max\{D - c^T x^{(k)}, 0\}^2
+    \end{align*}
+    with the only decision variable $c$.
+
+    \item[2.] Upon running the submitted code in \texttt{cens\_fit\_data.m}, we get the following results:
+    \begin{align*}
+      c_\text{ls} = [&-0.3476. -1.7955. 0.2000. 0.1672. -0.8357. 1.3005. 1.8276. -0.5612. 0.3686. -0.0454 \\
+   &-0.1096, 1.5265. -0.4980. 2.4164. -0.5563. -0.3701, 0.9900, -0.2539, -0.1762, -0.4349] \\
+   \hat{c} = [&-0.2946. -1.7541, 0.2589. 0.2241. -0.9917. 1.3018. 1.4262. -0.1554. 0.3785 \\
+    &0.2261. -0.0826. 1.0427. -0.4648. 2.1942. -0.3586. -0.1973. 1.0194. -0.1186. -0.1211, -0.7523]
+    \end{align*}
+    With relative errors:
+    \begin{align*}
+      \frac{\|c_\text{true} - c_\text{ls}\|_2}{\|c_\text{true}\|_2} &= 0.390676 \\
+      \frac{\|c_\text{true} - \hat{c}\|_2}{\|c_\text{true}\|_2} &= 0.178423
+    \end{align*}
+  \end{itemize}
+\end{itemize}
+
+\end{document}
