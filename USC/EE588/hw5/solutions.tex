@@ -1,0 +1,87 @@
+\documentclass{article}
+
+% Margins and spacing
+\usepackage[a4paper, margin=.7in]{geometry}
+% Math packages
+\usepackage{amsmath}
+\usepackage{amssymb}
+% Figures and graphics
+\usepackage{graphicx}
+\usepackage{caption}
+% Placement of figures, tables, algorithms, etc.
+\usepackage{float}
+% Hyperlinks
+\usepackage{hyperref}
+% Reference section names
+\usepackage{nameref}
+% Algorithms
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+% Sus
+\usepackage{listings}
+\usepackage{xcolor}
+
+%% Tips
+% Fix spacing between lines
+% \vspace{-\baselineskip}
+
+% No section numbering
+\setcounter{secnumdepth}{0}
+% No page numbering
+\pagenumbering{gobble}
+% No paragraph indentation
+\setlength{\parindent}{0pt}
+% Removes caption prefixes (e.g., "Figure 1:") from figures
+% \captionsetup[figure]{labelformat=empty}
+
+% Define custom commands
+%% Underlined hyperlinks
+\newcommand{\uhref}[2]{\href{#1}{\underline{#2}}}
+%% Bold-italic math symbols
+\newcommand{\mathbi}[1]{\boldsymbol{#1}}
+%% Caret symbol
+\newcommand{\caret}{\text{\^{}}}
+%% Operators
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator{\sgn}{sgn}
+\newcommand{\1}{\mathbf{1}}
+%% Manually indented states in algorithmic environment
+\newcommand{\IndentState}{\State \hspace{1em}}
+\newcommand{\DIndentState}{\State \hspace{2em}}
+
+
+% Custom style for Python formatting
+\lstset{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{purple},
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  stepnumber=1,
+  numbersep=10pt,
+  backgroundcolor=\color{white},
+  tabsize=4,
+  showstringspaces=false,
+  breaklines=true,
+  breakatwhitespace=true
+}
+
+\title{EE588: Homework 5 Solutions}
+\author{
+  Naman Chhibbar \\
+  USC ID: 7709-8548-02
+}
+\date{}
+
+% Document body
+\begin{document}
+\maketitle
+
+\begin{itemize}
+  \item
+\end{itemize}
+
+\end{document}
