@@ -119,16 +119,32 @@
   \end{itemize}
   
   \item \begin{itemize}
-    \item[1.] Since $v_i$ are independent, the likelihood of $x$ and $\phi$ ($z_1, \dots, z_m$) is given by solving the following optimization problem:
+    \item[1.] Since $v_i$ are independent, the likelihood of $x$ and $\phi(z)$ is given by solving the following optimization problem:
     \[ \text{maximize} \quad \sum_{i=1}^n (z_i - A-I^T x)^2 \]
     According to the problem, we must have $\alpha \le \phi'(u) \le \beta$. Since the measurements are sorted ($y_i \le y_{i+1}$) and quantized, we get the inequality:
     \begin{align*}
       \alpha &\le \phi'(u) \le \beta \\
       \implies \alpha &\le \frac{y_{i+1} - y_i}{z_{i+1} - z_i} \le \beta &i = 1, \dots, m-1 \\
-      \implies \beta &\le \frac{z_{i+1} - z_i}{y_{i+1} - y_i} \le \alpha &\text{(Since $\alpha, \beta > 0$)} \\
+      \implies \beta &\le \frac{z_{i+1} - z_i}{y_{i+1} - y_i} \le \alpha &\text{(Since $\alpha, \beta, y_{i+1} - y_i, z_{i+1} - z_i > 0$)} \\
       \implies \beta (y_{i+1} - y_i) &\le z_{i+1} - z_i \le \alpha &(y_{i+1} - y_i) 
     \end{align*}
+    \item[2.] Implementing the above solution in the provided code, we get the following results:
+    \[ \hat{x}_\text{ml} = [0.48193943, -0.46568707, 0.93639661, 0.92965073] \]
+    and here's the plot of $\hat{\phi}_{ml}$, $y_i$ against $(\hat{z}_{ml})_i$:
+    \begin{figure}[H]
+      \centering
+      \includegraphics[width=0.7\textwidth]{images/phi_ml_plot.png}
+      \caption{Maximum Likelihood Estimate of $\phi$}
+    \end{figure}
   \end{itemize}
+
+  \item Since $f_1, f_2$, and $f_3$ are affine, let:
+  \begin{align*}
+    f_1(x) &= a_1 x + b_1 \\
+    f_2(x) &= a_2 x + b_2 \\
+    f_3(x) &= a_3 x + b_3
+  \end{align*}
+  with $a_1, a_2, a_3 \in \mathbb{R}^n$ and $b_1, b_2, b_3 \in \mathbb{R}^n$. 
 \end{itemize}
 
 \end{document}
