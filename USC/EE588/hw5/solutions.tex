@@ -81,7 +81,54 @@
 \maketitle
 
 \begin{itemize}
-  \item
+  \item \begin{itemize}
+    \item[1.] For each compund $i \in \{1, \dots, n\}$, we can formulate two optimization problems to find $q_i^{\min}$ and $q_i^{\max}$:
+    \begin{align*}
+      \text{minimize} &\quad q_i^{\min} \\
+      \text{subject to} &\quad q \geq 0 \\
+      &\quad S \cdot q \geq l \\
+      &\quad S \cdot q \leq u \\
+    \end{align*}
+    and
+    \begin{align*}
+      \text{maximize} &\quad q_i^{\max} \\
+      \text{subject to} &\quad q \geq 0 \\
+      &\quad S \cdot q \geq l \\
+      &\quad S \cdot q \leq u \\
+    \end{align*}
+    \item[2.] Implementing the above solution in the provided code, we get the following results:
+    \begin{table}[H]
+      \centering
+      \begin{tabular}{|c|c|c|}
+        \hline
+        Compound $i$ & $q_i^{\min}$ & $q_i^{\max}$ \\
+        \hline
+        1 & 0.0000 & 0.0148 \\
+        2 & 0.4526 & 0.5071 \\
+        3 & 0.6903 & 0.7171 \\
+        4 & 0.1211 & 0.2052 \\
+        5 & 0.0000 & 0.0306 \\
+        6 & 0.0000 & 0.0207 \\
+        7 & 0.0000 & 0.1477 \\
+        8 & 0.0000 & 0.0978 \\
+        9 & 0.1365 & 0.2050 \\
+        10 & 0.0000 & 0.0357 \\
+        \hline
+      \end{tabular}
+    \end{table}
+  \end{itemize}
+  
+  \item \begin{itemize}
+    \item[1.] Since $v_i$ are independent, the likelihood of $x$ and $\phi$ ($z_1, \dots, z_m$) is given by solving the following optimization problem:
+    \[ \text{maximize} \quad \sum_{i=1}^n (z_i - A-I^T x)^2 \]
+    According to the problem, we must have $\alpha \le \phi'(u) \le \beta$. Since the measurements are sorted ($y_i \le y_{i+1}$) and quantized, we get the inequality:
+    \begin{align*}
+      \alpha &\le \phi'(u) \le \beta \\
+      \implies \alpha &\le \frac{y_{i+1} - y_i}{z_{i+1} - z_i} \le \beta &i = 1, \dots, m-1 \\
+      \implies \beta &\le \frac{z_{i+1} - z_i}{y_{i+1} - y_i} \le \alpha &\text{(Since $\alpha, \beta > 0$)} \\
+      \implies \beta (y_{i+1} - y_i) &\le z_{i+1} - z_i \le \alpha &(y_{i+1} - y_i) 
+    \end{align*}
+  \end{itemize}
 \end{itemize}
 
 \end{document}
