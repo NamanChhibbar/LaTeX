@@ -33,15 +33,28 @@ Z = [
    -4.9499   -3.4310   -4.2656   -6.2023   -4.5186   -3.7659   -5.0039 ...
    -4.3744   -5.0559   -3.9443   -4.0412   -5.3493   -3.0465];
 
-%cvx_begin
-% variables a1(2) a2(2) a3(2) b1 b2 b3
-% fill in your solution code here
-%
-%cvx_end
+cvx_begin
+    variables a1(2) a2(2) a3(2) b1 b2 b3
+    
+    minimize(0) % Feasibility problem
+    
+    subject to
+        % Constraints for X data points
+        a1'*X - b1 >= a2'*X - b2 + 1;
+        a1'*X - b1 >= a3'*X - b3 + 1;
+        
+        % Constraints for Y data points
+        a2'*Y - b2 >= a1'*Y - b1 + 1;
+        a2'*Y - b2 >= a3'*Y - b3 + 1;
+        
+        % Constraints for Z data points
+        a3'*Z - b3 >= a1'*Z - b1 + 1;
+        a3'*Z - b3 >= a2'*Z - b2 + 1;
+cvx_end
 
 % comment out the following line after filling in cvx part!
 % values below are not right!!
-a1=[1;1];a2=[1;-5];a3=[-1;-1];b1=0;b2=0;b3=0;
+% a1=[1;1];a2=[1;-5];a3=[-1;-1];b1=0;b2=0;b3=0;
 
 % now let's plot the three-way separation induced by
 % a1,a2,a3,b1,b2,b3

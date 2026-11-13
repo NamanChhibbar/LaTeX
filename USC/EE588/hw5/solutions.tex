@@ -138,13 +138,19 @@
     \end{figure}
   \end{itemize}
 
-  \item Since $f_1, f_2$, and $f_3$ are affine, let:
+  \item To formulate this as an optimization problem without using strict inequalities, we need to introduce a positive margin.
+  Since $a_i$ can be arbitrarily scaled, we can introduce a +1 margin, we can formulate the following optimization problem with $a_1, a_2, a_3 \in \mathbb{R}^n$ and $b_1, b_2, b_3 \in \mathbb{R}$ as:
   \begin{align*}
-    f_1(x) &= a_1 x + b_1 \\
-    f_2(x) &= a_2 x + b_2 \\
-    f_3(x) &= a_3 x + b_3
+    \text{minimize} &\quad 0 \\
+    \text{subject to} &\quad a_1^T x^{(j)} - b_1 \ge a_2^T x^{(j)} - b_2 + 1 &\text{(for $x_j$'s)} \\
+    &\quad a_1^T x^{(j)} - b_1 \ge a_3^T x^{(j)} - b_3 + 1 \\
+    &\quad a_2^T y^{(j)} - b_2 \ge a_1^T y^{(j)} - b_1 + 1 &\text{(for $y_j$'s)} \\
+    &\quad a_2^T y^{(j)} - b_2 \ge a_3^T y^{(j)} - b_3 + 1 \\
+    &\quad a_3^T z^{(j)} - b_3 \ge a_1^T z^{(j)} - b_1 + 1 &\text{(for $z_j$'s)} \\
+    &\quad a_3^T z^{(j)} - b_3 \ge a_2^T z^{j)} - b_2 + 1
   \end{align*}
-  with $a_1, a_2, a_3 \in \mathbb{R}^n$ and $b_1, b_2, b_3 \in \mathbb{R}^n$. 
+  We can have the objective function as 0 since we are only interested in satisfying the constraints. \\
+  `sep3way\_data.m' contains the implementation of the above optimization problem using CVX, which is attached in the submission.
 \end{itemize}
 
 \end{document}
